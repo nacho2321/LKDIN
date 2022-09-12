@@ -8,48 +8,52 @@ namespace LkdinServer
 {
     class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            //const int maxConexiones = 3;
+            const int maxClients = 3;
 
-            Console.WriteLine("Iniciando Aplicacion Servidor...");
+            Console.WriteLine("Iniciando Aplicacion Servidor...!");
             var socketServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             var localEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000);
 
             socketServer.Bind(localEndpoint);
-            socketServer.Listen(1);
+            socketServer.Listen(2);
 
-            //int conexiones = 0;
-            //while (conexiones < maxConexiones)
-            //{
-            var socketClient = socketServer.Accept();
-
-            Console.WriteLine("Acepte un nuevo pedido de conexion");
-            while (socketClient.Connected)
+            int conexiones = 0;
+            while (conexiones < maxClients)
             {
-                byte[] data = new byte[256];
-                socketClient.Receive(data);
-                string mensaje = Encoding.UTF8.GetString(data);
-                Console.WriteLine(mensaje);
+                var socketClient = socketServer.Accept();
+                Console.WriteLine("Acepte un nuevo pedido de conexion");
+                new Thread(() => ClientHandler(socketClient)).Start();
+                conexiones++;
             }
-
-            new Thread(() => ManejarCliente(socketClient)).Start();
-            // conexiones++;
-            // }
-
-            //Console.WriteLine("No hay conexiones disponibles");
-            //Console.ReadLine();
-
+            Console.WriteLine("No hay mas conexiones disponibles");
         }
 
-        static void ManejarCliente(Socket socketCliente)
+        static void ClientHandler(Socket socketCliente)
         {
-            while (socketCliente.Connected)
+            Console.WriteLine("Esperando por mensaje de cliente...");
+            try
             {
-                Thread.Sleep(1000);
-            }
+                bool detainedClient = false;
+                while (!detainedClient)
+                {
+                    byte[] data = new byte[256];
+                    int received = socketCliente.Receive(data);
+                    if (received == 0)
+                    {
+                        detainedClient = true;
+                        throw new SocketException();
+                    }
 
-            Console.WriteLine("Cliente Desconectado...");
+                    string message = $"Cliente dice: {Encoding.UTF8.GetString(data)}";
+                    Console.WriteLine(message);
+                }
+            }
+            catch (SocketException)
+            {
+                Console.WriteLine("Cliente Desconectado");
+            }
         }
     }
 }
