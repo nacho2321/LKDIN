@@ -88,10 +88,20 @@ namespace Lkdin
             Console.WriteLine("Apellido:");
             SendBytes(Console.ReadLine());
             Console.WriteLine("Edad:");
-            string age = Console.ReadLine();
-            if (Regex.IsMatch(age, @"^[0-9]+$")) SendBytes(age);
-            else Console.WriteLine("Debe ingresar solamente números");
-
+            bool isString = true;
+            while(isString)
+            {
+                string age = Console.ReadLine();
+                if (Regex.IsMatch(age, @"^[0-9]+$"))
+                {
+                    isString = false;
+                    SendBytes(age);
+                }
+                else
+                {
+                    Console.WriteLine("Debe ingresar solamente números");
+                }
+            }
             Console.WriteLine("Profesiones:");
             bool addProfessions = true;
             while (addProfessions)
@@ -99,14 +109,11 @@ namespace Lkdin
                 Console.WriteLine("Agregue una profesión:");
                 SendBytes(Console.ReadLine());
                 Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR PROFESIONES");
-
                 string option = Console.ReadLine();
                 if (option == "0") addProfessions = false;
             }
-
             Console.WriteLine("País:");
             SendBytes(Console.ReadLine());
-
             Console.WriteLine("\n USUARIO CREADO CORRECTAMENTE");
         }
 
