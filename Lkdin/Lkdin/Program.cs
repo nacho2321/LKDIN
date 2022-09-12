@@ -96,6 +96,7 @@ namespace Lkdin
             bool addProfessions = true;
             while (addProfessions)
             {
+                Console.WriteLine("Agregue una profesión:");
                 SendBytes(Console.ReadLine());
                 Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR PROFESIONES");
 
