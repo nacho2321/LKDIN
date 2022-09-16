@@ -40,7 +40,7 @@ namespace LKDIN_Server.Domain
                 {
                     throw new DomainException($"Su apellido debe estar entre {NameMinLength} y {NameMaxLength}");
                 }
-                this.surname = value ?? throw new ArgumentNullException("El nombre no puede ser null");
+                this.surname = value ?? throw new ArgumentNullException("El apellido no puede ser null");
             }
         }
 
@@ -63,6 +63,19 @@ namespace LKDIN_Server.Domain
             set
             {
                 this.professions = value ?? throw new ArgumentNullException("La lista de profesiones no puede ser null");
+            }
+        }
+
+        public string Country
+        {
+            get => this.country;
+            set
+            {
+                if (value?.Length < NameMinLength || value?.Length > NameMaxLength)
+                {
+                    throw new DomainException($"Su país debe estar entre {NameMinLength} y {NameMaxLength}");
+                }
+                this.surname = value ?? throw new ArgumentNullException("El país no puede ser null");
             }
         }
 
