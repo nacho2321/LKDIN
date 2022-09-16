@@ -45,12 +45,11 @@ namespace Lkdin
             Console.WriteLine(" ");
             Console.WriteLine("----------------------------------------------------------------------------- ");
             Console.WriteLine(" ");
-            Console.WriteLine("                           |1|   CONEXÓN CLIENTE-SERVIDOR");
-            Console.WriteLine("                           |2|   CREAR USUARIO");
-            Console.WriteLine("                           |3|   CREAR PERFIL DE TRABAJO DE USUARIO");
-            Console.WriteLine("                           |4|   AÑADIR FOTO A PERFIL DE TRABAJO");
-            Console.WriteLine("                           |5|   MOSTRAR PERFILES DE TRABAJO EXISTENTES");
-            Console.WriteLine("                           |6|   MENSAJES");
+            Console.WriteLine("                           |1|   CREAR USUARIO");
+            Console.WriteLine("                           |2|   CREAR PERFIL DE TRABAJO DE USUARIO");
+            Console.WriteLine("                           |3|   AÑADIR FOTO A PERFIL DE TRABAJO");
+            Console.WriteLine("                           |4|   MOSTRAR PERFILES DE TRABAJO EXISTENTES");
+            Console.WriteLine("                           |5|   MENSAJES");
             Console.WriteLine("\n                         |0|    SALIR");
 
             switch (Console.ReadLine())
@@ -63,10 +62,8 @@ namespace Lkdin
                 case "3":
                     return true;
                 case "4":
-                    return true;
+                    return true;;
                 case "5":
-                    return true;
-                case "6":
                     MessageMenu();
                     return true;
                 case "0":

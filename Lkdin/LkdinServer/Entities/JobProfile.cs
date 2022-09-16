@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace LKDIN_Server.Domain
 {
@@ -13,20 +14,16 @@ namespace LKDIN_Server.Domain
         public const int ImagePathMinLength = 3;
         public const int ImagePathMaxLength = 250;
 
-        private string ability;
+        private List<string> abilities;
         private string description;
         private string imagePath;
 
-        public string Ability
+        public List<string> Alities
         {
-            get => this.ability;
+            get => this.abilities;
             set
             {
-                if (value?.Length < AbilityMinLength || value?.Length > AbilityMaxLength)
-                {
-                    throw new DomainException($"El largo de la habilidad debe estar entre {AbilityMinLength} y {AbilityMaxLength}");
-                }
-                this.ability = value ?? throw new ArgumentNullException("La habilidad no puede ser null");
+                this.abilities = value ?? throw new ArgumentNullException("La lista de habilidades no puede ser null");
             }
         }
 
