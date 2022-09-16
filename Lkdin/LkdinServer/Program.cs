@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LkdinConnection;
+using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -8,6 +9,9 @@ namespace LkdinServer
 {
     class Program
     {
+        static Sender sender = new Sender();
+        static Listener listener = new Listener();
+
         public static void Main(string[] args)
         {
             const int maxClients = 3;
@@ -24,36 +28,11 @@ namespace LkdinServer
             {
                 var socketClient = socketServer.Accept();
                 Console.WriteLine("Acepte un nuevo pedido de conexion");
-                new Thread(() => ClientHandler(socketClient)).Start();
+                new Thread(() => listener.Handler(socketClient)).Start();
                 conexiones++;
             }
             Console.WriteLine("No hay mas conexiones disponibles");
         }
 
-        static void ClientHandler(Socket socketCliente)
-        {
-            Console.WriteLine("Esperando por mensaje de cliente...");
-            try
-            {
-                bool detainedClient = false;
-                while (!detainedClient)
-                {
-                    byte[] data = new byte[256];
-                    int received = socketCliente.Receive(data);
-                    if (received == 0)
-                    {
-                        detainedClient = true;
-                        throw new SocketException();
-                    }
-
-                    string message = $"Cliente dice: {Encoding.UTF8.GetString(data)}";
-                    Console.WriteLine(message);
-                }
-            }
-            catch (SocketException)
-            {
-                Console.WriteLine("Cliente Desconectado");
-            }
-        }
     }
 }
