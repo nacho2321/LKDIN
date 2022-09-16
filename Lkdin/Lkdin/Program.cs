@@ -55,9 +55,10 @@ namespace Lkdin
             switch (Console.ReadLine())
             {
                 case "1":
+                    CreateUser();
                     return true;
                 case "2":
-                    CreateUser();
+                    CreateJobProfile();
                     return true;
                 case "3":
                     return true;
@@ -86,8 +87,13 @@ namespace Lkdin
             SendBytes(Console.ReadLine());
             Console.WriteLine("Edad:");
             string age = Console.ReadLine();
-            if (Regex.IsMatch(age, @"^[0-9]+$")) SendBytes(age);
-            else Console.WriteLine("Debe ingresar solamente números");
+
+            while (!Regex.IsMatch(age, @"^[0-9]+$"))
+            {
+                Console.WriteLine("Debe ingresar solamente números");
+                age = Console.ReadLine();
+            }
+            SendBytes(age);
 
             Console.WriteLine("Profesiones:");
             bool addProfessions = true;
@@ -105,6 +111,30 @@ namespace Lkdin
             SendBytes(Console.ReadLine());
 
             Console.WriteLine("\n USUARIO CREADO CORRECTAMENTE");
+        }
+
+        private static void CreateJobProfile()
+        {
+            Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
+            Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
+            Console.WriteLine("Descripción:");
+            SendBytes(Console.ReadLine());
+            Console.WriteLine("Ubiación de la foto de perfil:");
+            SendBytes(Console.ReadLine());
+
+            Console.WriteLine("Habilidades:");
+            bool addAbilities = true;
+            while (addAbilities)
+            {
+                Console.WriteLine("Agregue una Habilidad:");
+                SendBytes(Console.ReadLine());
+                Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
+
+                string option = Console.ReadLine();
+                if (option == "0") addAbilities = false;
+            }
+
+            Console.WriteLine("\n PERFIL DE TRABAJO CREADO CORRECTAMENTE");
         }
 
         private static void MessageMenu() 
