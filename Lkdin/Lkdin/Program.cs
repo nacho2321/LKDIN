@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using LkdinConnection;
 
 namespace Lkdin
 {
@@ -26,12 +27,6 @@ namespace Lkdin
             {
                 showMenu = MainMenu();
             }
-        }
-
-        private static void SendBytes(string message)
-        {
-            byte[] data = Encoding.UTF8.GetBytes(message);
-            socketClient.Send(data);
         }
 
         private static bool MainMenu()
@@ -82,9 +77,9 @@ namespace Lkdin
             Console.WriteLine("█▀▀ █▀█ █▀▀ ▄▀█ █▀▀ █ █▀█ █▄░█   █▀▄ █▀▀   █░█ █▀ █░█ ▄▀█ █▀█ █ █▀█ █▀");
             Console.WriteLine("█▄▄ █▀▄ ██▄ █▀█ █▄▄ █ █▄█ █░▀█   █▄▀ ██▄   █▄█ ▄█ █▄█ █▀█ █▀▄ █ █▄█ ▄█");
             Console.WriteLine("Nombre:");
-            SendBytes(Console.ReadLine());
+            new Sender().SendBytes(Console.ReadLine(), socketClient);
             Console.WriteLine("Apellido:");
-            SendBytes(Console.ReadLine());
+            new Sender().SendBytes(Console.ReadLine(), socketClient);
             Console.WriteLine("Edad:");
             string age = Console.ReadLine();
 
@@ -93,14 +88,14 @@ namespace Lkdin
                 Console.WriteLine("Debe ingresar solamente números");
                 age = Console.ReadLine();
             }
-            SendBytes(age);
+            new Sender().SendBytes(age, socketClient);
 
             Console.WriteLine("Profesiones:");
             bool addProfessions = true;
             while (addProfessions)
             {
                 Console.WriteLine("Agregue una Profesión:");
-                SendBytes(Console.ReadLine());
+                new Sender().SendBytes(Console.ReadLine(), socketClient);
                 Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR PROFESIONES");
 
                 string option = Console.ReadLine();
@@ -108,7 +103,7 @@ namespace Lkdin
             }
 
             Console.WriteLine("País:");
-            SendBytes(Console.ReadLine());
+            new Sender().SendBytes(Console.ReadLine(), socketClient);
 
             Console.WriteLine("\n USUARIO CREADO CORRECTAMENTE");
         }
@@ -118,16 +113,16 @@ namespace Lkdin
             Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
             Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
             Console.WriteLine("Descripción:");
-            SendBytes(Console.ReadLine());
+            new Sender().SendBytes(Console.ReadLine(), socketClient);
             Console.WriteLine("Ubiación de la foto de perfil:");
-            SendBytes(Console.ReadLine());
+            new Sender().SendBytes(Console.ReadLine(), socketClient);
 
             Console.WriteLine("Habilidades:");
             bool addAbilities = true;
             while (addAbilities)
             {
                 Console.WriteLine("Agregue una Habilidad:");
-                SendBytes(Console.ReadLine());
+                new Sender().SendBytes(Console.ReadLine(), socketClient);
                 Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
 
                 string option = Console.ReadLine();
@@ -167,7 +162,7 @@ namespace Lkdin
         private static void SendMessage()
         {
             Console.WriteLine("ENVIAR MENSAJES");
-            SendBytes(Console.ReadLine());
+            new Sender().SendBytes(Console.ReadLine(), socketClient);
             Console.WriteLine("\n MENSAJE ENVIADO CORRECTAMENTE");
         }
 
