@@ -56,5 +56,27 @@ namespace LKDIN_Server.Domain
                 this.age = value;
             }
         }
+
+        public List<string> Professions
+        {
+            get => this.professions;
+            set
+            {
+                this.professions = value ?? throw new ArgumentNullException("La lista de profesiones no puede ser null");
+            }
+        }
+
+        public JobProfile Profile
+        {
+            get => this.profile;
+            set => this.profile = value;
+        }
+
+        public List<Message> Inbox
+        {
+            get => this.inbox;
+            set => this.inbox = value;
+        }
     }
 }
+

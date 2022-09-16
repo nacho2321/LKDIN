@@ -18,7 +18,7 @@ namespace LKDIN_Server.Domain
         private string description;
         private string imagePath;
 
-        public List<string> Alities
+        public List<string> Abilities
         {
             get => this.abilities;
             set
