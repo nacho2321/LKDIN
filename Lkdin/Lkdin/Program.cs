@@ -104,15 +104,22 @@ namespace Lkdin
             {
                 Console.WriteLine("Agregue una Profesión:");
                 userData += Console.ReadLine() + ";";
-                Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR PROFESIONES");
+                repeat:
+                    Console.WriteLine("\n                         |1|    AGREGAR MÁS PROFESIONES");
+                    Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR PROFESIONES");
 
-                string option = Console.ReadLine();
-                if (option == "0") // Bug - si se ingresa mas de una profesion, al presionar 0 no sale, al presionar de nuevo si.
-                {
-                    userData = userData.Remove(userData.Length - 1, 1);
-                    userData += "-";
-                    addProfessions = false;
-                } 
+                    string option = Console.ReadLine();
+                    if (option == "0")
+                    {
+                        userData = userData.Remove(userData.Length - 1, 1);
+                        userData += "-";
+                        addProfessions = false;
+                    }
+                    else if (option != "0" && option != "1")
+                    {
+                        Console.WriteLine("\n Debe ingresar solamenente 1 o 0");
+                        goto repeat;
+                    }
             }
 
             Console.WriteLine("País:");
