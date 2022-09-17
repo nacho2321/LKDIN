@@ -7,8 +7,9 @@ namespace LkdinConnection
 {
     public class Listener
     {
-        public void Handler(Socket socket)
+        public string Handler(Socket socket)
         {
+            string recievedMessage = "";
             try
             {
                 bool detainedClient = false;
@@ -30,6 +31,8 @@ namespace LkdinConnection
             {
                 Console.WriteLine("Desconectado");
             }
+
+            return recievedMessage;
         }
     }
 }
