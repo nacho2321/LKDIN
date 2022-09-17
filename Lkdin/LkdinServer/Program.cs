@@ -14,14 +14,16 @@ namespace LkdinServer
 
         public static void Main(string[] args)
         {
-            const int maxClients = 3;
 
             Console.WriteLine("Iniciando Aplicacion Servidor...!");
+            // Generico
             var socketServer = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            var localEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000);
+            var localEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000); // Generico - IP y Puerto dinamico
 
-            socketServer.Bind(localEndpoint);
-            socketServer.Listen(2);
+            socketServer.Bind(localEndpoint);// Generico
+            // SOLO SERVER //////////////////////////////
+            const int maxClients = 3;
+            socketServer.Listen(maxClients); // recibe por parametro la cantidad maxima de conexiones permitidas
 
             int conexiones = 0;
             while (conexiones < maxClients)
@@ -32,6 +34,7 @@ namespace LkdinServer
                 conexiones++;
             }
             Console.WriteLine("No hay mas conexiones disponibles");
+            /////////////////////////////////////////////
         }
 
     }

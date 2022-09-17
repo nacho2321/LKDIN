@@ -9,21 +9,23 @@ namespace Lkdin
 {
     class Program
     {
+        // Generico
         static Socket socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         static Sender sender = new Sender();
 
         static void Main(string[] args)
         {
             Console.WriteLine("Iniciando Aplicacion Cliente...");
-            var localEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0);
-            socketClient.Bind(localEndpoint);
+            // Generico
+            var localEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0); // Generico - IP y Puerto dinamico
+            socketClient.Bind(localEndpoint); // Generico
 
-            var remoteEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000);
-
+            var remoteEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000); // Leer del archivo - es el socket del server
+            
+            // SOLO CLIENTE
             socketClient.Connect(remoteEndpoint);
-
             Console.WriteLine("Conectado con el servidor");
-
+            ///////////////
             bool showMenu = true;
             while (showMenu)
             {
@@ -60,7 +62,7 @@ namespace Lkdin
                 case "3":
                     return true;
                 case "4":
-                    return true;;
+                    return true;
                 case "5":
                     MessageMenu();
                     return true;
@@ -76,7 +78,7 @@ namespace Lkdin
 
         private static void CreateUser()
         {
-            string userData = "01#";
+            string userData = "";
             Console.WriteLine("█▀▀ █▀█ █▀▀ ▄▀█ █▀▀ █ █▀█ █▄░█   █▀▄ █▀▀   █░█ █▀ █░█ ▄▀█ █▀█ █ █▀█ █▀");
             Console.WriteLine("█▄▄ █▀▄ ██▄ █▀█ █▄▄ █ █▄█ █░▀█   █▄▀ ██▄   █▄█ ▄█ █▄█ █▀█ █▀▄ █ █▄█ ▄█");
             Console.WriteLine("Nombre:");
@@ -85,7 +87,6 @@ namespace Lkdin
             userData += Console.ReadLine() + "#";
             Console.WriteLine("Edad:");
             string age = Console.ReadLine();
-
             while (!Regex.IsMatch(age, @"^[0-9]+$"))
             {
                 Console.WriteLine("Debe ingresar solamente números");
@@ -111,32 +112,40 @@ namespace Lkdin
             }
 
             Console.WriteLine("País:");
-            sender.SendBytes(Console.ReadLine(), socketClient);
+            userData += Console.ReadLine() + "#";
 
+            sender.SendBytes(01, userData, socketClient);
             Console.WriteLine("\n USUARIO CREADO CORRECTAMENTE");
         }
 
         private static void CreateJobProfile()
         {
+            string jobProfileData = "";
             Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
             Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
             Console.WriteLine("Descripción:");
-            sender.SendBytes(Console.ReadLine(), socketClient);
+            jobProfileData += Console.ReadLine() + "#";
             Console.WriteLine("Ubiación de la foto de perfil:");
-            sender.SendBytes(Console.ReadLine(), socketClient);
+            jobProfileData += Console.ReadLine() + "#";
 
             Console.WriteLine("Habilidades:");
             bool addAbilities = true;
             while (addAbilities)
             {
                 Console.WriteLine("Agregue una Habilidad:");
-                sender.SendBytes(Console.ReadLine(), socketClient);
+                jobProfileData += Console.ReadLine() + ";";
                 Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
 
                 string option = Console.ReadLine();
-                if (option == "0") addAbilities = false;
+                if (option == "0")
+                {
+                    jobProfileData = jobProfileData.Remove(jobProfileData.Length - 1, 1);
+                    jobProfileData += "#";
+                    addAbilities = false;
+                }
             }
 
+            sender.SendBytes(02, jobProfileData, socketClient);
             Console.WriteLine("\n PERFIL DE TRABAJO CREADO CORRECTAMENTE");
         }
 
@@ -170,7 +179,7 @@ namespace Lkdin
         private static void SendMessage()
         {
             Console.WriteLine("ENVIAR MENSAJES");
-            sender.SendBytes(Console.ReadLine(), socketClient);
+            sender.SendBytes(02, Console.ReadLine(), socketClient);
             Console.WriteLine("\n MENSAJE ENVIADO CORRECTAMENTE");
         }
 
