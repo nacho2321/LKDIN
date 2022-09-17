@@ -7,6 +7,7 @@ namespace LkdinConnection
 {
     public class Sender
     {
+
         public void SendBytes(string message, Socket socket)
         {
             byte[] data = Encoding.UTF8.GetBytes(message);

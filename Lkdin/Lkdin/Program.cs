@@ -76,12 +76,13 @@ namespace Lkdin
 
         private static void CreateUser()
         {
+            string userData = "01#";
             Console.WriteLine("█▀▀ █▀█ █▀▀ ▄▀█ █▀▀ █ █▀█ █▄░█   █▀▄ █▀▀   █░█ █▀ █░█ ▄▀█ █▀█ █ █▀█ █▀");
             Console.WriteLine("█▄▄ █▀▄ ██▄ █▀█ █▄▄ █ █▄█ █░▀█   █▄▀ ██▄   █▄█ ▄█ █▄█ █▀█ █▀▄ █ █▄█ ▄█");
             Console.WriteLine("Nombre:");
-            sender.SendBytes(Console.ReadLine(), socketClient);
+            userData += Console.ReadLine() + "#";
             Console.WriteLine("Apellido:");
-            sender.SendBytes(Console.ReadLine(), socketClient);
+            userData += Console.ReadLine() + "#";
             Console.WriteLine("Edad:");
             string age = Console.ReadLine();
 
@@ -90,18 +91,23 @@ namespace Lkdin
                 Console.WriteLine("Debe ingresar solamente números");
                 age = Console.ReadLine();
             }
-            sender.SendBytes(age, socketClient);
+            userData += age + "#";
 
             Console.WriteLine("Profesiones:");
             bool addProfessions = true;
             while (addProfessions)
             {
                 Console.WriteLine("Agregue una Profesión:");
-                sender.SendBytes(Console.ReadLine(), socketClient);
+                userData += Console.ReadLine() + ";";
                 Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR PROFESIONES");
 
                 string option = Console.ReadLine();
-                if (option == "0") addProfessions = false;
+                if (option == "0")
+                {
+                    userData = userData.Remove(userData.Length - 1, 1);
+                    userData += "#";
+                    addProfessions = false;
+                } 
             }
 
             Console.WriteLine("País:");
