@@ -10,6 +10,7 @@ namespace LkdinServer.Connection
     class ConnectionHandler
     {
         const int maxClients = 3; // Se tiene que llamar desde archivo de configuracion
+        private int connections = 0;
 
         private Socket socket;
 
@@ -24,14 +25,14 @@ namespace LkdinServer.Connection
         {
             this.socket.Listen(maxClients);
 
-            int conexiones = 0;
-            while (conexiones < maxClients)
+           
+            while (connections < maxClients)
             {
                 var socketClient = this.socket.Accept();
 
                 Console.WriteLine("Nueva conexión establecida");
                 new Thread(() => this.Handler(socketClient)).Start();
-                conexiones++;
+                connections++;
             }
             Console.WriteLine("Limite de conexiones alcanzado");
         }
@@ -57,6 +58,7 @@ namespace LkdinServer.Connection
             }
             catch (SocketException)
             {
+                connections--;
                 Console.WriteLine("Cliente desconectado");
             }
 
