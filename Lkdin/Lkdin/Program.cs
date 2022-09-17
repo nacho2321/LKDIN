@@ -81,10 +81,13 @@ namespace Lkdin
             string userData = "";
             Console.WriteLine("█▀▀ █▀█ █▀▀ ▄▀█ █▀▀ █ █▀█ █▄░█   █▀▄ █▀▀   █░█ █▀ █░█ ▄▀█ █▀█ █ █▀█ █▀");
             Console.WriteLine("█▄▄ █▀▄ ██▄ █▀█ █▄▄ █ █▄█ █░▀█   █▄▀ ██▄   █▄█ ▄█ █▄█ █▀█ █▀▄ █ █▄█ ▄█");
+            
             Console.WriteLine("Nombre:");
-            userData += Console.ReadLine() + "#";
+            userData += Console.ReadLine() + "-";
+
             Console.WriteLine("Apellido:");
-            userData += Console.ReadLine() + "#";
+            userData += Console.ReadLine() + "-";
+
             Console.WriteLine("Edad:");
             string age = Console.ReadLine();
             while (!Regex.IsMatch(age, @"^[0-9]+$"))
@@ -92,7 +95,8 @@ namespace Lkdin
                 Console.WriteLine("Debe ingresar solamente números");
                 age = Console.ReadLine();
             }
-            userData += age + "#";
+            
+            userData += age + "-";
 
             Console.WriteLine("Profesiones:");
             bool addProfessions = true;
@@ -103,19 +107,19 @@ namespace Lkdin
                 Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR PROFESIONES");
 
                 string option = Console.ReadLine();
-                if (option == "0")
+                if (option == "0") // Bug - si se ingresa mas de una profesion, al presionar 0 no sale, al presionar de nuevo si.
                 {
                     userData = userData.Remove(userData.Length - 1, 1);
-                    userData += "#";
+                    userData += "-";
                     addProfessions = false;
                 } 
             }
 
             Console.WriteLine("País:");
-            userData += Console.ReadLine() + "#";
+            userData += Console.ReadLine() + "-";
 
-            sender.SendBytes(01, userData, socketClient);
-            Console.WriteLine("\n USUARIO CREADO CORRECTAMENTE");
+            sender.SendBytes(Command.CreateUser, userData, socketClient);
+            Console.WriteLine("\n USUARIO CREADO CORRECTAMENTE"); //TODO - Respuesta según servidor
         }
 
         private static void CreateJobProfile()
@@ -124,9 +128,9 @@ namespace Lkdin
             Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
             Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
             Console.WriteLine("Descripción:");
-            jobProfileData += Console.ReadLine() + "#";
+            jobProfileData += Console.ReadLine() + "-";
             Console.WriteLine("Ubiación de la foto de perfil:");
-            jobProfileData += Console.ReadLine() + "#";
+            jobProfileData += Console.ReadLine() + "-";
 
             Console.WriteLine("Habilidades:");
             bool addAbilities = true;
@@ -140,19 +144,20 @@ namespace Lkdin
                 if (option == "0")
                 {
                     jobProfileData = jobProfileData.Remove(jobProfileData.Length - 1, 1);
-                    jobProfileData += "#";
+                    jobProfileData += "-";
                     addAbilities = false;
                 }
             }
 
-            sender.SendBytes(02, jobProfileData, socketClient);
-            Console.WriteLine("\n PERFIL DE TRABAJO CREADO CORRECTAMENTE");
+            sender.SendBytes(Command.CreateJobProfile, jobProfileData, socketClient);
+            Console.WriteLine("\n PERFIL DE TRABAJO CREADO CORRECTAMENTE"); //TODO - Respuesta según servidor
         }
 
         private static void MessageMenu() 
         {
             Console.WriteLine("█▀▄▀█ █▀▀ █▄░█ █▀ ▄▀█ ░░█ █▀▀ █▀");
             Console.WriteLine("█░▀░█ ██▄ █░▀█ ▄█ █▀█ █▄█ ██▄ ▄█");
+            
             Console.WriteLine("|1|   ENVIAR MENSAJE" +
                 "\n|2|   VER MENSAJES" +
                 "\n|0|   VOLVER AL MENÚ PRINCIPAL");
@@ -179,13 +184,16 @@ namespace Lkdin
         private static void SendMessage()
         {
             Console.WriteLine("ENVIAR MENSAJES");
-            sender.SendBytes(02, Console.ReadLine(), socketClient);
-            Console.WriteLine("\n MENSAJE ENVIADO CORRECTAMENTE");
+            sender.SendBytes(Command.SendMessage, Console.ReadLine(), socketClient);
+            Console.WriteLine("\n MENSAJE ENVIADO CORRECTAMENTE");//TODO - Respuesta según servidor
         }
 
         private static void Inbox()
         {
             Console.WriteLine("BANDEJA DE ENTRADA");
+
+            sender.SendBytes(Command.SendMessage, socketClient);
+            //TODO - Respuesta según servidor
         }
     }
 }

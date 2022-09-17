@@ -49,7 +49,7 @@ namespace LKDIN_Server.Domain
             get => this.age;
             set
             {
-                if (value < MaxAge || value > MinAge)
+                if (value > MaxAge || value < MinAge)
                 {
                     throw new DomainException($"Su edad debe estar entre los {MinAge} y los {MaxAge} años");
                 }

@@ -1,5 +1,6 @@
 ﻿using LkdinConnection;
 using LkdinServer.Connection;
+using LkdinServer.Logic;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -15,7 +16,8 @@ namespace LkdinServer
 
         public static void Main(string[] args)
         {
-            ConnectionHandler serverConnection = new ConnectionHandler();
+            UserLogic userLogic = new UserLogic();
+            ConnectionHandler serverConnection = new ConnectionHandler(userLogic);
             Console.WriteLine("Iniciando Aplicacion Servidor...");
             serverConnection.Listen();
         }

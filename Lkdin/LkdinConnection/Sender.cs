@@ -8,10 +8,23 @@ namespace LkdinConnection
 {
     public class Sender
     {
-        public void SendBytes(int order, string message, Socket socket)
+        public void SendBytes(Command order, string message, Socket socket)
         {
-            byte[] data = Encoding.UTF8.GetBytes(order +"#" + message);
+            byte[] data = Encoding.UTF8.GetBytes((int)order + "#" + message);
             socket.Send(data);
         }
+
+        public void SendBytes(Command order, Socket socket)
+        {
+            SendBytes(order, "", socket);
+        }
+
     }
+}
+public enum Command
+{
+    CreateUser,
+    CreateJobProfile,
+    SendMessage,
+    ReadMessages,
 }
