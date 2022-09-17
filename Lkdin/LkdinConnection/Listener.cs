@@ -7,7 +7,7 @@ namespace LkdinConnection
 {
     public class Listener
     {
-        public void Handler(Socket socketCliente)
+        public void Handler(Socket socket)
         {
             try
             {
@@ -15,14 +15,14 @@ namespace LkdinConnection
                 while (!detainedClient)
                 {
                     byte[] data = new byte[256];
-                    int received = socketCliente.Receive(data);
+                    int received = socket.Receive(data);
                     if (received == 0)
                     {
                         detainedClient = true;
                         throw new SocketException();
                     }
 
-                    string message = $"Dice: {Encoding.UTF8.GetString(data)}";
+                    string message = Encoding.UTF8.GetString(data);
                     Console.WriteLine(message);
                 }
             }

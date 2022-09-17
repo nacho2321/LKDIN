@@ -9,21 +9,23 @@ namespace Lkdin
 {
     class Program
     {
+        // Generico
         static Socket socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         static Sender sender = new Sender();
 
         static void Main(string[] args)
         {
             Console.WriteLine("Iniciando Aplicacion Cliente...");
-            var localEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0);
-            socketClient.Bind(localEndpoint);
+            // Generico
+            var localEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0); // Generico - IP y Puerto dinamico
+            socketClient.Bind(localEndpoint); // Generico
 
-            var remoteEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000);
-
+            var remoteEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000); // Leer del archivo - es el socket del server
+            
+            // SOLO CLIENTE
             socketClient.Connect(remoteEndpoint);
-
             Console.WriteLine("Conectado con el servidor");
-
+            ///////////////
             bool showMenu = true;
             while (showMenu)
             {
@@ -60,7 +62,7 @@ namespace Lkdin
                 case "3":
                     return true;
                 case "4":
-                    return true;;
+                    return true;
                 case "5":
                     MessageMenu();
                     return true;
