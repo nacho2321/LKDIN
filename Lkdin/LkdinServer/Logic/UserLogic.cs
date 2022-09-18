@@ -9,12 +9,11 @@ namespace LkdinServer.Logic
     {
         private List<User> users = new List<User>();
 
-        public void CreateUser(string name, string surname, int age, List<string> professions, string country)
+        public void CreateUser(string name, int age, List<string> professions, string country)
         {
             User newUser = new User()
             {
                 Name = name,
-                Surname = surname,
                 Age = age,
                 Professions = professions,
                 Country = country,
@@ -23,6 +22,28 @@ namespace LkdinServer.Logic
             };
 
             users.Add(newUser);
+        }
+
+        public User GetUserByName (string name)
+        {
+            User userToReturn = null;
+
+            for (int i = 0; i < users.Count; i++)
+            {
+                if (users[i].Name == name)
+                {
+                    userToReturn = users[i]; 
+                }
+            }
+
+            return userToReturn;
+        }
+
+        public void AssignJobProfile(string name, JobProfile jobProfile)
+        {
+            User userToAssign = GetUserByName(name);
+
+            userToAssign.Profile = jobProfile;
         }
 
     }

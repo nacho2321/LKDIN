@@ -85,9 +85,6 @@ namespace Lkdin
             Console.WriteLine("Nombre:");
             userData += Console.ReadLine() + "-";
 
-            Console.WriteLine("Apellido:");
-            userData += Console.ReadLine() + "-";
-
             Console.WriteLine("Edad:");
             string age = Console.ReadLine();
             while (!Regex.IsMatch(age, @"^[0-9]+$"))

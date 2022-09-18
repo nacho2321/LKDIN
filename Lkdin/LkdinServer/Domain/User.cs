@@ -11,7 +11,6 @@ namespace LKDIN_Server.Domain
         public const int MinAge = 18;
 
         private string name;
-        private string surname;
         private int age;
         private List<string> professions;
         private string country;
@@ -28,19 +27,6 @@ namespace LKDIN_Server.Domain
                     throw new DomainException($"Su nombre debe estar entre {NameMinLength} y {NameMaxLength}");
                 }
                 this.name = value ?? throw new ArgumentNullException("El nombre no puede ser null");
-            }
-        }
-
-        public string Surname
-        {
-            get => this.surname;
-            set
-            {
-                if (value?.Length < NameMinLength || value?.Length > NameMaxLength)
-                {
-                    throw new DomainException($"Su apellido debe estar entre {NameMinLength} y {NameMaxLength}");
-                }
-                this.surname = value ?? throw new ArgumentNullException("El apellido no puede ser null");
             }
         }
 
