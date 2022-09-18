@@ -8,6 +8,7 @@ namespace LKDIN_Server.Domain
         private User sender;
         private User receptor;
         private bool read;
+        private string content;
 
         public User Sender
         {
@@ -33,6 +34,15 @@ namespace LKDIN_Server.Domain
             set
             {
                 this.read = value;
+            }
+        }
+
+        public string Content
+        {
+            get => this.content;
+            set
+            {
+                this.content = value;
             }
         }
 

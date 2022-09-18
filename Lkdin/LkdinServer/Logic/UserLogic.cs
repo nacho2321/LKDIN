@@ -24,6 +24,11 @@ namespace LkdinServer.Logic
             users.Add(newUser);
         }
 
+        internal void AddMessage(Message newMessage, User receptor)
+        {
+            receptor.Inbox.Add(newMessage);
+        }
+
         public User GetUserByName (string name)
         {
             User userToReturn = null;
