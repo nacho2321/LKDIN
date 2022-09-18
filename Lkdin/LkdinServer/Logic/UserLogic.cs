@@ -5,7 +5,7 @@ using System.Text;
 
 namespace LkdinServer.Logic
 {
-    class UserLogic
+    public class UserLogic
     {
         private List<User> users = new List<User>();
 
