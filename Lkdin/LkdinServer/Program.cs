@@ -2,10 +2,6 @@
 using LkdinServer.Connection;
 using LkdinServer.Logic;
 using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 
 namespace LkdinServer
 {

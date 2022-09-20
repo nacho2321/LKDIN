@@ -83,7 +83,7 @@ namespace LkdinServer.Connection
             switch (order)
             {
                 case Command.CreateUser:
-                    userLogic.CreateUser(splittedData[0], splittedData[1], Int32.Parse(splittedData[2]), splittedData[3].Split(";").ToList(), splittedData[4]);
+                    userLogic.CreateUser(splittedData[0], Int32.Parse(splittedData[1]), splittedData[2].Split(";").ToList(), splittedData[3]);
                     break;
                 case Command.CreateJobProfile:
 
