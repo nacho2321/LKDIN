@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using LKDIN_Server.Domain;
 using LkdinConnection;
 
 namespace Lkdin
@@ -57,7 +59,7 @@ namespace Lkdin
                     CreateUser();
                     return true;
                 case "2":
-                    CreateJobProfile();
+                    JobProfileMenu();
                     return true;
                 case "3":
                     return true;
@@ -123,14 +125,15 @@ namespace Lkdin
             userData += Console.ReadLine() + "-";
 
             sender.SendBytes(Command.CreateUser, userData, socketClient);
-            Console.WriteLine("\n USUARIO CREADO CORRECTAMENTE"); //TODO - Respuesta según servidor
         }
 
-        private static void CreateJobProfile()
+        private static void JobProfileMenu()
         {
             string jobProfileData = "";
             Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
             Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
+            int user = UsersMenu("asignar un perfil de trabajo:");
+
             Console.WriteLine("Descripción:");
             jobProfileData += Console.ReadLine() + "-";
             Console.WriteLine("Ubiación de la foto de perfil:");
@@ -188,6 +191,7 @@ namespace Lkdin
         private static void SendMessage()
         {
             Console.WriteLine("ENVIAR MENSAJES");
+            int user = UsersMenu("mandar un mensaje:");
             sender.SendBytes(Command.SendMessage, Console.ReadLine(), socketClient);
             Console.WriteLine("\n MENSAJE ENVIADO CORRECTAMENTE");//TODO - Respuesta según servidor
         }
@@ -198,6 +202,33 @@ namespace Lkdin
 
             sender.SendBytes(Command.SendMessage, socketClient);
             //TODO - Respuesta según servidor
+        }
+
+        private static int UsersMenu(string action)
+        {
+            //List<User> users = sender.SendBytes(Command.GetUsers, socketClient);
+            List<User> users = null;
+            repeat:
+            Console.WriteLine("Elija el usuario al que le desea " + action);
+
+            for (int i = 0; i < users.Count; i++)
+            {
+                Console.WriteLine(i + " - " + users[i].Name);
+            }
+
+            string userSelected = Console.ReadLine();
+
+            try
+            {
+                User user = users[Int32.Parse(userSelected)];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Verifique los datos ingresados");
+                goto repeat;
+            }
+
+            return Int32.Parse(userSelected);
         }
     }
 }

@@ -79,21 +79,38 @@ namespace LkdinServer.Connection
         public void RoutingOrder(Command order, String data)
         {
             string[] splittedData = data.Split("-");
-
-            switch (order)
+            try
             {
-                case Command.CreateUser:
-                    userLogic.CreateUser(splittedData[0], Int32.Parse(splittedData[1]), splittedData[2].Split(";").ToList(), splittedData[3]);
-                    break;
-                case Command.CreateJobProfile:
+                switch (order)
+                {
+                    case Command.CreateUser:
+                        userLogic.CreateUser(splittedData[0], Int32.Parse(splittedData[1]), splittedData[2].Split(";").ToList(), splittedData[3]);
+                        Console.WriteLine("\n USUARIO CREADO CORRECTAMENTE"); //TODO - Respuesta según servidor
+                        break;
+                    case Command.CreateJobProfile:
 
-                    break;
-                case Command.SendMessage:
+                        break;
+                    case Command.SendMessage:
 
-                    break;
-                case Command.ReadMessages:
+                        break;
+                    case Command.ReadMessages:
 
-                    break;
+                        break;
+                    case Command.GetUsers:
+                        userLogic.GetUsers();
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (ex is DomainException)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                else if (ex is ArgumentNullException)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
     }

@@ -51,5 +51,10 @@ namespace LkdinServer.Logic
             userToAssign.Profile = jobProfile;
         }
 
+        public List<User> GetUsers()
+        {
+            return users;
+        }
+
     }
 }

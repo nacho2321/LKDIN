@@ -61,7 +61,7 @@ namespace LKDIN_Server.Domain
                 {
                     throw new DomainException($"Su país debe estar entre {NameMinLength} y {NameMaxLength}");
                 }
-                this.surname = value ?? throw new ArgumentNullException("El país no puede ser null");
+                this.country = value ?? throw new ArgumentNullException("El país no puede ser null");
             }
         }
 

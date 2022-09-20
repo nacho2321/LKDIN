@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace LKDIN_Server.Domain
 {
     [Serializable]
-    internal class DomainException : Exception
+    public class DomainException : Exception
     {
         public DomainException()
         {
