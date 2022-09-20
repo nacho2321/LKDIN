@@ -1,4 +1,5 @@
 ﻿using LKDIN_Server.Domain;
+using LkdinConnection;
 using LkdinServer.Logic;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,13 @@ namespace LkdinServer.Connection
         private int connections = 0;
 
         private Socket socket;
+        private Sender sender;
         private UserLogic userLogic;
 
-        public ConnectionHandler(UserLogic userLogic)
+        public ConnectionHandler(UserLogic userLogic, Sender sender)
         {
             this.userLogic = userLogic;
+            this.sender = sender;
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             var localEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000); // Se tiene que llamar desde archivo de configuracion (IP & puerto)
             this.socket.Bind(localEndpoint);
@@ -65,7 +68,7 @@ namespace LkdinServer.Connection
                     Command order = (Command)Int32.Parse(splittedMessage[0]);
                     string recievedData = splittedMessage[1];
 
-                    RoutingOrder(order, recievedData);
+                    RoutingOrder(order, recievedData, socket);
                 }
             }
             catch (SocketException)
@@ -76,14 +79,15 @@ namespace LkdinServer.Connection
 
         }
 
-        public void RoutingOrder(Command order, String data)
+        public void RoutingOrder(Command order, string data, Socket socket)
         {
             string[] splittedData = data.Split("-");
 
             switch (order)
             {
                 case Command.CreateUser:
-                    userLogic.CreateUser(splittedData[0], Int32.Parse(splittedData[1]), splittedData[2].Split(";").ToList(), splittedData[3]);
+                    User usrToSend = userLogic.CreateUser(splittedData[0], Int32.Parse(splittedData[1]), splittedData[2].Split(";").ToList(), splittedData[3]);
+                    sender.SendBytes(Command.CreateUser, usrToSend.Name, socket);
                     break;
                 case Command.CreateJobProfile:
 
