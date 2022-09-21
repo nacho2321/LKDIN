@@ -19,13 +19,17 @@ namespace LkdinServer.Connection
         private Socket socket;
         private Sender sender;
         private UserLogic userLogic;
+        static readonly SettingsManager settingsMngr = new SettingsManager();
 
         public ConnectionHandler(UserLogic userLogic, Sender sender)
         {
             this.userLogic = userLogic;
             this.sender = sender;
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            var localEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000); // Se tiene que llamar desde archivo de configuracion (IP & puerto)
+            string ipServer = settingsMngr.ReadSettings(ServerConfig.serverIPconfigkey);
+            int ipPort = int.Parse(settingsMngr.ReadSettings(ServerConfig.serverPortconfigkey));
+            var localEndpoint = new IPEndPoint(IPAddress.Parse(ipServer), ipPort);
+
             this.socket.Bind(localEndpoint);
         }
 
