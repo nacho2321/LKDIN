@@ -11,23 +11,26 @@ namespace Lkdin
 {
     class Program
     {
-        // Generico
-        static Socket socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         static Sender sender = new Sender();
         static Listener listener = new Listener();
-        static IPEndPoint remoteEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000); // Leer del archivo - es el socket del server
-        
+        static readonly SettingsManager settingsMngr = new SettingsManager();
+        static Socket socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
         static void Main(string[] args)
         {
             Console.WriteLine("Iniciando Aplicacion Cliente...");
-            // Generico
-            var localEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0); // Generico - IP y Puerto dinamico
-            socketClient.Bind(localEndpoint); // Generico
-    
-            socketClient.Connect(remoteEndpoint); // SOLO CLIENTE 
+
+            string ipServer = settingsMngr.ReadSettings(ClientConfig.serverIPconfigkey);
+            string ipClient = settingsMngr.ReadSettings(ClientConfig.clientIPconfigkey);
+            int serverPort = int.Parse(settingsMngr.ReadSettings(ClientConfig.serverPortconfigkey));
+
+            var localEndPoint = new IPEndPoint(IPAddress.Parse(ipClient), 0);
+            socketClient.Bind(localEndPoint);
+            var serverEndpoint = new IPEndPoint(IPAddress.Parse(ipServer), serverPort);
+            socketClient.Connect(serverEndpoint);
 
             Console.WriteLine("Conectado con el servidor");
-            ///////////////
+
             bool showMenu = true;
             while (showMenu)
             {

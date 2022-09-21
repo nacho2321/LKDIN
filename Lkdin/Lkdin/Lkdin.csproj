@@ -10,4 +10,10 @@
     <ProjectReference Include="..\LkdinServer\LkdinServer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="App.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
