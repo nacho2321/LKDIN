@@ -14,18 +14,18 @@ namespace Lkdin
         // Generico
         static Socket socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         static Sender sender = new Sender();
-
+        static Listener listener = new Listener();
+        static IPEndPoint remoteEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000); // Leer del archivo - es el socket del server
+        
         static void Main(string[] args)
         {
             Console.WriteLine("Iniciando Aplicacion Cliente...");
             // Generico
             var localEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 0); // Generico - IP y Puerto dinamico
             socketClient.Bind(localEndpoint); // Generico
+    
+            socketClient.Connect(remoteEndpoint); // SOLO CLIENTE 
 
-            var remoteEndpoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000); // Leer del archivo - es el socket del server
-            
-            // SOLO CLIENTE
-            socketClient.Connect(remoteEndpoint);
             Console.WriteLine("Conectado con el servidor");
             ///////////////
             bool showMenu = true;
@@ -125,6 +125,8 @@ namespace Lkdin
             userData += Console.ReadLine() + "-";
 
             sender.SendBytes(Command.CreateUser, userData, socketClient);
+          
+            Console.WriteLine(listener.Handler(socketClient)); // Respuesta según servidor
         }
 
         private static void JobProfileMenu()

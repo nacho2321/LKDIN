@@ -27,5 +27,6 @@ public enum Command
     CreateJobProfile,
     SendMessage,
     ReadMessages,
-    GetUsers
+    GetUsers,
+    ThrowException
 }

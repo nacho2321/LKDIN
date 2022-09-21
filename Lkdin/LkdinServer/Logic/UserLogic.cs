@@ -9,7 +9,7 @@ namespace LkdinServer.Logic
     {
         private List<User> users = new List<User>();
 
-        public void CreateUser(string name, int age, List<string> professions, string country)
+        public User CreateUser(string name, int age, List<string> professions, string country)
         {
             User newUser = new User()
             {
@@ -22,6 +22,7 @@ namespace LkdinServer.Logic
             };
 
             users.Add(newUser);
+            return newUser;
         }
 
         internal void AddMessage(Message newMessage, User receptor)
@@ -29,7 +30,7 @@ namespace LkdinServer.Logic
             receptor.Inbox.Add(newMessage);
         }
 
-        public User GetUserByName (string name)
+        public User GetUserByName(string name)
         {
             User userToReturn = null;
 

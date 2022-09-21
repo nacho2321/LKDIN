@@ -13,7 +13,7 @@ namespace LkdinServer
         public static void Main(string[] args)
         {
             UserLogic userLogic = new UserLogic();
-            ConnectionHandler serverConnection = new ConnectionHandler(userLogic);
+            ConnectionHandler serverConnection = new ConnectionHandler(userLogic, sender);
             Console.WriteLine("Iniciando Aplicacion Servidor...");
             serverConnection.Listen();
         }
