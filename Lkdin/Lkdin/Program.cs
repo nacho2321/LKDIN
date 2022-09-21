@@ -139,8 +139,7 @@ namespace Lkdin
             userData += Console.ReadLine() + "-";
 
             sender.SendBytes(Command.CreateUser, userData, socketClient);
-          
-            Console.WriteLine(listener.Handler(socketClient)); // Respuesta según servidor
+            Console.WriteLine(listener.Handler(socketClient));
         }
 
         private static void JobProfileMenu()
@@ -152,7 +151,7 @@ namespace Lkdin
 
             Console.WriteLine("Descripción:");
             jobProfileData += Console.ReadLine() + "-";
-            Console.WriteLine("Ubiación de la foto de perfil:");
+            Console.WriteLine("Ubicación de la foto de perfil:");
             jobProfileData += Console.ReadLine() + "-";
 
             Console.WriteLine("Habilidades:");
@@ -173,7 +172,7 @@ namespace Lkdin
             }
 
             sender.SendBytes(Command.CreateJobProfile, jobProfileData, socketClient);
-            Console.WriteLine("\n PERFIL DE TRABAJO CREADO CORRECTAMENTE"); //TODO - Respuesta según servidor
+            Console.WriteLine(listener.Handler(socketClient));
         }
 
         private static void MessageMenu() 

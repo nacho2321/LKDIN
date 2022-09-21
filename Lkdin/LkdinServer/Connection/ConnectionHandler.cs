@@ -13,20 +13,22 @@ namespace LkdinServer.Connection
 {
     class ConnectionHandler
     {
-        
+
         private int connections = 0;
         private int maxClients;
 
         private Socket socket;
         private Sender sender;
         private UserLogic userLogic;
+        private JobProfileLogic jobProfileLogic;
         
         static readonly SettingsManager settingsMngr = new SettingsManager();
 
-        public ConnectionHandler(UserLogic userLogic, Sender sender)
+        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, Sender sender)
         {
             this.maxClients = Int32.Parse(settingsMngr.ReadSettings(ServerConfig.serverMaxClientsconfigkey));
             this.userLogic = userLogic;
+            this.jobProfileLogic = jobProfileLogic;
             this.sender = sender;
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             string ipServer = settingsMngr.ReadSettings(ServerConfig.serverIPconfigkey);
@@ -40,7 +42,6 @@ namespace LkdinServer.Connection
         {
             this.socket.Listen(maxClients);
 
-           
             while (connections < maxClients)
             {
                 var socketClient = this.socket.Accept();
@@ -98,7 +99,8 @@ namespace LkdinServer.Connection
                         sender.SendBytes(Command.CreateUser, "USUARIO CREADO CORRECTAMENTE", socket);
                         break;
                     case Command.CreateJobProfile:
-
+                        jobProfileLogic.CreateJobProfile(splittedData[0], splittedData[1], splittedData[2].Split(";").ToList());
+                        sender.SendBytes(Command.CreateJobProfile, "PERFIL DE TRABAJO CREADO CORRECTAMENTE", socket);
                         break;
                     case Command.SendMessage:
 
