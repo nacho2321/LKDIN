@@ -44,9 +44,7 @@ namespace Lkdin
                 
                 Console.WriteLine("No se ha podido conectar con el servidor, reinicie la aplicación e intente nuevamente");
             }
-            
-
-            
+              
         }
 
         private static bool MainMenu()
