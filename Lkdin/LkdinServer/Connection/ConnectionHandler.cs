@@ -13,16 +13,19 @@ namespace LkdinServer.Connection
 {
     class ConnectionHandler
     {
-        const int maxClients = 3; // Se tiene que llamar desde archivo de configuracion
+        
         private int connections = 0;
+        private int maxClients;
 
         private Socket socket;
         private Sender sender;
         private UserLogic userLogic;
+        
         static readonly SettingsManager settingsMngr = new SettingsManager();
 
         public ConnectionHandler(UserLogic userLogic, Sender sender)
         {
+            this.maxClients = Int32.Parse(settingsMngr.ReadSettings(ServerConfig.serverMaxClientsconfigkey));
             this.userLogic = userLogic;
             this.sender = sender;
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);

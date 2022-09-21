@@ -8,5 +8,6 @@ namespace LkdinServer
     {
         public static string serverIPconfigkey = "ServerIpAddress";
         public static string serverPortconfigkey = "ServerPort";
+        public static string serverMaxClientsconfigkey = "MaxClients";
     }
 }
