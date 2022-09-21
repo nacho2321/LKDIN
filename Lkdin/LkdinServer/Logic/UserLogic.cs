@@ -52,9 +52,44 @@ namespace LkdinServer.Logic
             userToAssign.Profile = jobProfile;
         }
 
-        public List<User> GetUsers()
+        public List<string> GetUsersName()
         {
-            return users;
+            List<string> usersName = new List<string>();
+            for (int i = 0; i < users.Count; i++)
+            {
+                usersName.Add(users[i].Name);
+            }
+
+            return usersName;
+        }
+
+        public string ShowMessages(string user, bool readMessages)
+        {
+            List<Message> messages = new List<Message>();
+            string filteredMessages = "";
+
+            for (int i = 0; i < users.Count; i++)
+            {
+                if (users[i].Name == user) 
+                {
+                    messages = users[i].Inbox;
+                }
+            }
+
+            for (int i = 0; i < messages.Count; i++)
+            {
+                if (!messages[i].Read && !readMessages)
+                {
+                    filteredMessages += "DESTINATARIO: " + messages[i].Sender.Name + "\n" + messages[i].Content;
+                    messages[i].Read = true;
+                }
+                else if (messages[i].Read && readMessages)
+                {
+                    filteredMessages += "DESTINATARIO: " + messages[i].Sender.Name + "\n" + messages[i].Content;
+                }
+            }
+
+            return filteredMessages;
         }
 
     }

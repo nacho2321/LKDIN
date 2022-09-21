@@ -23,7 +23,6 @@ namespace LkdinServer.Logic
                 Content = content
             };
             this.userLogic.AddMessage(newMessage, receptor);
-        
         }
 
     }

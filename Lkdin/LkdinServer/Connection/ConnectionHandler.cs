@@ -97,10 +97,21 @@ namespace LkdinServer.Connection
 
                         break;
                     case Command.ReadMessages:
-
+                        string messages = "";
+                        if (splittedData[1] == "readMessages")
+                        {
+                            messages = userLogic.ShowMessages(splittedData[0], true);
+                        }
+                        else
+                        {
+                            messages = userLogic.ShowMessages(splittedData[0], false);
+                        }
+                        sender.SendBytes(Command.ReadMessages, messages, socket);
                         break;
-                    case Command.GetUsers:
-                        userLogic.GetUsers();
+                    case Command.GetUsersName:
+                        List<string> usersName = userLogic.GetUsersName();
+                        string joinedNames = String.Join("; ", usersName.ToArray());
+                        sender.SendBytes(Command.GetUsersName, joinedNames, socket);
                         break;
                 }
             }

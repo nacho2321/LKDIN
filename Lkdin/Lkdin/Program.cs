@@ -134,7 +134,7 @@ namespace Lkdin
             string jobProfileData = "";
             Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
             Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
-            int user = UsersMenu("asignar un perfil de trabajo:");
+            string user = UsersMenu("asignar un perfil de trabajo:");
 
             Console.WriteLine("Descripción:");
             jobProfileData += Console.ReadLine() + "-";
@@ -193,7 +193,7 @@ namespace Lkdin
         private static void SendMessage()
         {
             Console.WriteLine("ENVIAR MENSAJES");
-            int user = UsersMenu("mandar un mensaje:");
+            string user = UsersMenu("mandar un mensaje:");
             sender.SendBytes(Command.SendMessage, Console.ReadLine(), socketClient);
             Console.WriteLine("\n MENSAJE ENVIADO CORRECTAMENTE");//TODO - Respuesta según servidor
         }
@@ -201,36 +201,44 @@ namespace Lkdin
         private static void Inbox()
         {
             Console.WriteLine("BANDEJA DE ENTRADA");
+            string user = UsersMenu("ver mensajes");
+            repeat:
+            Console.WriteLine("|1|   Ver mensajes nuevos" +
+            "\n|2|   Ver mensajes leídos");
 
-            sender.SendBytes(Command.SendMessage, socketClient);
-            //TODO - Respuesta según servidor
+            string option = Console.ReadLine();
+            if (option == "2")
+            {
+                sender.SendBytes(Command.ReadMessages, user + "-" + "readMessages", socketClient);
+            }
+            else if (option != "1" && option != "2")
+            {
+                Console.WriteLine("\n Debe ingresar solamenente 1 o 2");
+                goto repeat;
+            }
+            else
+            {
+                sender.SendBytes(Command.ReadMessages, user + "-" + "newMessages", socketClient);
+            }
         }
 
-        private static int UsersMenu(string action)
+        private static string UsersMenu(string action)
         {
-            //List<User> users = sender.SendBytes(Command.GetUsers, socketClient);
-            List<User> users = null;
+            sender.SendBytes(Command.GetUsersName, socketClient);
+            string users = listener.Handler(socketClient);
+
             repeat:
             Console.WriteLine("Elija el usuario al que le desea " + action);
-
-            for (int i = 0; i < users.Count; i++)
-            {
-                Console.WriteLine(i + " - " + users[i].Name);
-            }
+            Console.WriteLine(users);
 
             string userSelected = Console.ReadLine();
 
-            try
-            {
-                User user = users[Int32.Parse(userSelected)];
-            }
-            catch (Exception ex)
-            {
+            if (!users.Contains(userSelected)) { 
                 Console.WriteLine("Verifique los datos ingresados");
                 goto repeat;
             }
 
-            return Int32.Parse(userSelected);
+            return userSelected;
         }
     }
 }
