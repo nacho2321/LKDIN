@@ -27,15 +27,26 @@ namespace Lkdin
             var localEndPoint = new IPEndPoint(IPAddress.Parse(ipClient), 0);
             socketClient.Bind(localEndPoint);
             var serverEndpoint = new IPEndPoint(IPAddress.Parse(ipServer), serverPort);
-            socketClient.Connect(serverEndpoint);
-
-            Console.WriteLine("Conectado con el servidor");
-
-            bool showMenu = true;
-            while (showMenu)
+            
+            try
             {
-                showMenu = MainMenu();
+                socketClient.Connect(serverEndpoint);
+                Console.WriteLine("Conectado con el servidor");
+
+                bool showMenu = true;
+                while (showMenu)
+                {
+                    showMenu = MainMenu();
+                }
             }
+            catch (SocketException ex)
+            {
+                
+                Console.WriteLine("No se ha podido conectar con el servidor, reinicie la aplicación e intente nuevamente");
+            }
+            
+
+            
         }
 
         private static bool MainMenu()
