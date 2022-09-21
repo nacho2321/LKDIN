@@ -25,6 +25,7 @@ namespace LkdinConnection
 
                     string message = Encoding.UTF8.GetString(data);
                     Console.WriteLine(message);
+                    detainedClient = true;
                 }
             }
             catch (SocketException)
