@@ -64,7 +64,7 @@ namespace Lkdin
             Console.WriteLine("                           |3|   AÑADIR FOTO A PERFIL DE TRABAJO");
             Console.WriteLine("                           |4|   MOSTRAR PERFILES DE TRABAJO EXISTENTES");
             Console.WriteLine("                           |5|   MENSAJES");
-            Console.WriteLine("\n                         |0|    SALIR");
+            Console.WriteLine("                           |0|   SALIR");
 
             switch (Console.ReadLine())
             {
@@ -214,61 +214,50 @@ namespace Lkdin
 
         private static void SendMessage()
         {
+            string users = "";
+            string message = "";
             Console.WriteLine("ENVIAR MENSAJES");
+            users += UsersMenu("Elija el usuario que va a mandar un mensaje:") + "-";
+            users += UsersMenu("Elija el usuario que va a recibir el mensaje:") + "-";
+            Console.WriteLine("Escriba su mensaje: ");
+            message = Console.ReadLine();
 
-            string[] users = getUsers();
-
-            if (users.Length != 0)
-            {
-                string user = UsersMenu("mandar un mensaje:", getUsers());
-                sender.SendBytes(Command.SendMessage, Console.ReadLine(), socketClient);
-                Console.WriteLine("\n MENSAJE ENVIADO CORRECTAMENTE"); // TODO - Respuesta según servidor
-            }
-            else
-            {
-                Console.WriteLine("No hay usuarios ingresados en el sistema actualmente");
-            }
+            sender.SendBytes(Command.SendMessage, users+message, socketClient);
+            Console.WriteLine(listener.Handler(socketClient));
         }
 
         private static void Inbox()
         {
             Console.WriteLine("BANDEJA DE ENTRADA");
-            string[] users = getUsers();
+            string user = UsersMenu("Elija el usuario que desea ver su bandeja de entrada:");
+            repeat:
+            Console.WriteLine("|1|   Ver mensajes nuevos" +
+            "\n|2|   Ver mensajes leídos");
 
-            if (users.Length != 0)
+            string option = Console.ReadLine();
+            if (option == "2")
             {
-                string user = UsersMenu("ver mensajes", users);
-                repeat:
-                Console.WriteLine("|1|   Ver mensajes nuevos" +
-                "\n|2|   Ver mensajes leídos");
-
-                string option = Console.ReadLine();
-                if (option == "2")
-                {
-                    sender.SendBytes(Command.ReadMessages, user + "-" + "readMessages", socketClient);
-                }
-                else if (option != "1" && option != "2")
-                {
-                    Console.WriteLine("\n Debe ingresar solamenente 1 o 2");
-                    goto repeat;
-                }
-                else
-                {
-                    sender.SendBytes(Command.ReadMessages, user + "-" + "newMessages", socketClient);
-                }
+                sender.SendBytes(Command.ReadMessages, user + "-" + "readMessages", socketClient);
+            }
+            else if (option != "1" && option != "2")
+            {
+                Console.WriteLine("\n Debe ingresar solamenente 1 o 2");
+                goto repeat;
             }
             else
             {
-                Console.WriteLine("No hay usuarios ingresados en el sistema actualmente");
+                sender.SendBytes(Command.ReadMessages, user + "-" + "newMessages", socketClient);
             }
-            
+
+            Console.WriteLine(listener.Handler(socketClient));
+            Console.WriteLine(listener.Handler(socketClient));
         }
 
         private static string UsersMenu(string action, string[] users)
         {
 
             repeat:
-            Console.WriteLine("Elija el usuario al que le desea " + action);
+            Console.WriteLine(action);
             Console.WriteLine(users);
 
             string userSelected = Console.ReadLine();

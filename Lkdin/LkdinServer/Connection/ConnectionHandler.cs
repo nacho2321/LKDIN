@@ -21,14 +21,16 @@ namespace LkdinServer.Connection
         private Sender sender;
         private UserLogic userLogic;
         private JobProfileLogic jobProfileLogic;
+        private MessageLogic messageLogic;
         
         static readonly SettingsManager settingsMngr = new SettingsManager();
 
-        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, Sender sender)
+        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender)
         {
             this.maxClients = Int32.Parse(settingsMngr.ReadSettings(ServerConfig.serverMaxClientsconfigkey));
             this.userLogic = userLogic;
             this.jobProfileLogic = jobProfileLogic;
+            this.messageLogic = messageLogic;
             this.sender = sender;
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             string ipServer = settingsMngr.ReadSettings(ServerConfig.serverIPconfigkey);
@@ -103,11 +105,14 @@ namespace LkdinServer.Connection
                         sender.SendBytes(Command.CreateJobProfile, "PERFIL DE TRABAJO CREADO CORRECTAMENTE", socket);
                         break;
                     case Command.SendMessage:
-
+                        User userSender = userLogic.GetUserByName(splittedData[0]);
+                        User userReceptor = userLogic.GetUserByName(splittedData[1]);
+                        messageLogic.CreateMessage(userSender, userReceptor, splittedData[2]);
+                        sender.SendBytes(Command.CreateJobProfile, "MENSAJE ENVIADO CORRECTAMENTE", socket);
                         break;
                     case Command.ReadMessages:
                         string messages = "";
-                        if (splittedData[1] == "readMessages")
+                        if (splittedData[1].Contains("readMessages"))
                         {
                             messages = userLogic.ShowMessages(splittedData[0], true);
                         }
@@ -116,6 +121,7 @@ namespace LkdinServer.Connection
                             messages = userLogic.ShowMessages(splittedData[0], false);
                         }
                         sender.SendBytes(Command.ReadMessages, messages, socket);
+                        sender.SendBytes(Command.ReadMessages, "MENSAJES MOSTRADOS CORRECTAMENTE", socket);
                         break;
                     case Command.GetUsersName:
                         List<string> usersName = userLogic.GetUsersName();

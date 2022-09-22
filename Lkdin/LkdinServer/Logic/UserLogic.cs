@@ -85,7 +85,7 @@ namespace LkdinServer.Logic
                 }
                 else if (messages[i].Read && readMessages)
                 {
-                    filteredMessages += "DESTINATARIO: " + messages[i].Sender.Name + "\n" + messages[i].Content;
+                    filteredMessages += "DESTINATARIO: " + messages[i].Sender.Name + "\n" + messages[i].Content + "\n" +"\n";
                 }
             }
 
