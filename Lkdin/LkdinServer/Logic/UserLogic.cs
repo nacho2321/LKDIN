@@ -17,8 +17,8 @@ namespace LkdinServer.Logic
                 Age = age,
                 Professions = professions,
                 Country = country,
-                Profile = null,
-                Inbox = null
+                Profile = new JobProfile(),
+                Inbox = new List<Message>()
             };
 
             users.Add(newUser);

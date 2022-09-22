@@ -12,7 +12,7 @@ namespace LKDIN_Server.Domain
         public const int DescriptionMaxLength = 250;
 
         public const int ImagePathMinLength = 3;
-        public const int ImagePathMaxLength = 250;
+        public const int ImagePathMaxLength = 550;
 
         private List<string> abilities;
         private string description;

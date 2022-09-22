@@ -45,9 +45,7 @@ namespace Lkdin
 
                 Console.WriteLine("No se ha podido conectar con el servidor, reinicie la aplicación e intente nuevamente");
             }
-
-
-
+              
         }
 
         private static bool MainMenu()
@@ -140,8 +138,7 @@ namespace Lkdin
             userData += Console.ReadLine() + "-";
 
             sender.SendBytes(Command.CreateUser, userData, socketClient);
-
-            Console.WriteLine(listener.Handler(socketClient)); // Respuesta según servidor
+            Console.WriteLine(listener.Handler(socketClient));
         }
 
         private static void JobProfileMenu()
@@ -179,7 +176,7 @@ namespace Lkdin
                 }
 
                 sender.SendBytes(Command.CreateJobProfile, jobProfileData, socketClient);
-                Console.WriteLine("\n PERFIL DE TRABAJO CREADO CORRECTAMENTE"); //TODO - Respuesta según servidor
+                Console.WriteLine(listener.Handler(socketClient));
             }
             else
             {
@@ -289,7 +286,7 @@ namespace Lkdin
         {
             sender.SendBytes(Command.GetUsersName, socketClient);
             string[] response = listener.Handler(socketClient).Split("#");
-            string[] users = (response.Length != 0 && response[0] != "") ? response[1].Split(";") : new string[] { };
+            string[] users = (response.Length != 0 && response[0] != "") ? response[1].Split(";") : new string[] {};
             return users;
         }
     }

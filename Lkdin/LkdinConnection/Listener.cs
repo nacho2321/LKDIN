@@ -24,7 +24,7 @@ namespace LkdinConnection
                     }
 
                     string message = Encoding.UTF8.GetString(data);
-                    Console.WriteLine(message);
+                    recievedMessage = message;
                     detainedClient = true;
                 }
             }
