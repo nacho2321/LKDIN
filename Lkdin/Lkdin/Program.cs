@@ -203,16 +203,22 @@ namespace Lkdin
 
         private static void SendMessage()
         {
+            string users = "";
+            string message = "";
             Console.WriteLine("ENVIAR MENSAJES");
-            string user = UsersMenu("mandar un mensaje:");
-            sender.SendBytes(Command.SendMessage, Console.ReadLine(), socketClient);
-            Console.WriteLine("\n MENSAJE ENVIADO CORRECTAMENTE");//TODO - Respuesta según servidor
+            users += UsersMenu("Elija el usuario que va a mandar un mensaje:") + "-";
+            users += UsersMenu("Elija el usuario que va a recibir el mensaje:") + "-";
+            Console.WriteLine("Escriba su mensaje: ");
+            message = Console.ReadLine();
+
+            sender.SendBytes(Command.SendMessage, users+message, socketClient);
+            Console.WriteLine(listener.Handler(socketClient));
         }
 
         private static void Inbox()
         {
             Console.WriteLine("BANDEJA DE ENTRADA");
-            string user = UsersMenu("ver mensajes");
+            string user = UsersMenu("Elija el usuario que desea ver su bandeja de entrada:");
             repeat:
             Console.WriteLine("|1|   Ver mensajes nuevos" +
             "\n|2|   Ver mensajes leídos");
@@ -231,6 +237,9 @@ namespace Lkdin
             {
                 sender.SendBytes(Command.ReadMessages, user + "-" + "newMessages", socketClient);
             }
+
+            Console.WriteLine(listener.Handler(socketClient));
+            Console.WriteLine(listener.Handler(socketClient));
         }
 
         private static string UsersMenu(string action)
@@ -239,7 +248,7 @@ namespace Lkdin
             string users = listener.Handler(socketClient);
 
             repeat:
-            Console.WriteLine("Elija el usuario al que le desea " + action);
+            Console.WriteLine(action);
             Console.WriteLine(users);
 
             string userSelected = Console.ReadLine();
