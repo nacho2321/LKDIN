@@ -63,7 +63,7 @@ namespace Lkdin
             Console.WriteLine("                           |3|   AÑADIR FOTO A PERFIL DE TRABAJO");
             Console.WriteLine("                           |4|   MOSTRAR PERFILES DE TRABAJO EXISTENTES");
             Console.WriteLine("                           |5|   MENSAJES");
-            Console.WriteLine("\n                         |0|    SALIR");
+            Console.WriteLine("                           |0|   SALIR");
 
             switch (Console.ReadLine())
             {
