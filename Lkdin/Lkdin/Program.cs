@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -27,7 +28,7 @@ namespace Lkdin
             var localEndPoint = new IPEndPoint(IPAddress.Parse(ipClient), 0);
             socketClient.Bind(localEndPoint);
             var serverEndpoint = new IPEndPoint(IPAddress.Parse(ipServer), serverPort);
-            
+
             try
             {
                 socketClient.Connect(serverEndpoint);
@@ -41,12 +42,12 @@ namespace Lkdin
             }
             catch (SocketException ex)
             {
-                
+
                 Console.WriteLine("No se ha podido conectar con el servidor, reinicie la aplicación e intente nuevamente");
             }
-            
 
-            
+
+
         }
 
         private static bool MainMenu()
@@ -97,7 +98,7 @@ namespace Lkdin
             string userData = "";
             Console.WriteLine("█▀▀ █▀█ █▀▀ ▄▀█ █▀▀ █ █▀█ █▄░█   █▀▄ █▀▀   █░█ █▀ █░█ ▄▀█ █▀█ █ █▀█ █▀");
             Console.WriteLine("█▄▄ █▀▄ ██▄ █▀█ █▄▄ █ █▄█ █░▀█   █▄▀ ██▄   █▄█ ▄█ █▄█ █▀█ █▀▄ █ █▄█ ▄█");
-            
+
             Console.WriteLine("Nombre:");
             userData += Console.ReadLine() + "-";
 
@@ -108,7 +109,7 @@ namespace Lkdin
                 Console.WriteLine("Debe ingresar solamente números");
                 age = Console.ReadLine();
             }
-            
+
             userData += age + "-";
 
             Console.WriteLine("Profesiones:");
@@ -118,28 +119,28 @@ namespace Lkdin
                 Console.WriteLine("Agregue una Profesión:");
                 userData += Console.ReadLine() + ";";
                 repeat:
-                    Console.WriteLine("\n                         |1|    AGREGAR MÁS PROFESIONES");
-                    Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR PROFESIONES");
+                Console.WriteLine("\n                         |1|    AGREGAR MÁS PROFESIONES");
+                Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR PROFESIONES");
 
-                    string option = Console.ReadLine();
-                    if (option == "0")
-                    {
-                        userData = userData.Remove(userData.Length - 1, 1);
-                        userData += "-";
-                        addProfessions = false;
-                    }
-                    else if (option != "0" && option != "1")
-                    {
-                        Console.WriteLine("\n Debe ingresar solamenente 1 o 0");
-                        goto repeat;
-                    }
+                string option = Console.ReadLine();
+                if (option == "0")
+                {
+                    userData = userData.Remove(userData.Length - 1, 1);
+                    userData += "-";
+                    addProfessions = false;
+                }
+                else if (option != "0" && option != "1")
+                {
+                    Console.WriteLine("\n Debe ingresar solamenente 1 o 0");
+                    goto repeat;
+                }
             }
 
             Console.WriteLine("País:");
             userData += Console.ReadLine() + "-";
 
             sender.SendBytes(Command.CreateUser, userData, socketClient);
-          
+
             Console.WriteLine(listener.Handler(socketClient)); // Respuesta según servidor
         }
 
@@ -148,39 +149,49 @@ namespace Lkdin
             string jobProfileData = "";
             Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
             Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
-            string user = UsersMenu("asignar un perfil de trabajo:");
 
-            Console.WriteLine("Descripción:");
-            jobProfileData += Console.ReadLine() + "-";
-            Console.WriteLine("Ubiación de la foto de perfil:");
-            jobProfileData += Console.ReadLine() + "-";
+            string[] users = getUsers();
 
-            Console.WriteLine("Habilidades:");
-            bool addAbilities = true;
-            while (addAbilities)
+            if (users.Length != 0)
             {
-                Console.WriteLine("Agregue una Habilidad:");
-                jobProfileData += Console.ReadLine() + ";";
-                Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
+                string user = UsersMenu("asignar un perfil de trabajo:", getUsers());
 
-                string option = Console.ReadLine();
-                if (option == "0")
+                Console.WriteLine("Descripción:");
+                jobProfileData += Console.ReadLine() + "-";
+                Console.WriteLine("Ubiación de la foto de perfil:");
+                jobProfileData += Console.ReadLine() + "-";
+
+                Console.WriteLine("Habilidades:");
+                bool addAbilities = true;
+                while (addAbilities)
                 {
-                    jobProfileData = jobProfileData.Remove(jobProfileData.Length - 1, 1);
-                    jobProfileData += "-";
-                    addAbilities = false;
-                }
-            }
+                    Console.WriteLine("Agregue una Habilidad:");
+                    jobProfileData += Console.ReadLine() + ";";
+                    Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
 
-            sender.SendBytes(Command.CreateJobProfile, jobProfileData, socketClient);
-            Console.WriteLine("\n PERFIL DE TRABAJO CREADO CORRECTAMENTE"); //TODO - Respuesta según servidor
+                    string option = Console.ReadLine();
+                    if (option == "0")
+                    {
+                        jobProfileData = jobProfileData.Remove(jobProfileData.Length - 1, 1);
+                        jobProfileData += "-";
+                        addAbilities = false;
+                    }
+                }
+
+                sender.SendBytes(Command.CreateJobProfile, jobProfileData, socketClient);
+                Console.WriteLine("\n PERFIL DE TRABAJO CREADO CORRECTAMENTE"); //TODO - Respuesta según servidor
+            }
+            else
+            {
+                Console.WriteLine("No hay usuarios ingresados en el sistema actualmente");
+            }
         }
 
-        private static void MessageMenu() 
+        private static void MessageMenu()
         {
             Console.WriteLine("█▀▄▀█ █▀▀ █▄░█ █▀ ▄▀█ ░░█ █▀▀ █▀");
             Console.WriteLine("█░▀░█ ██▄ █░▀█ ▄█ █▀█ █▄█ ██▄ ▄█");
-            
+
             Console.WriteLine("|1|   ENVIAR MENSAJE" +
                 "\n|2|   VER MENSAJES" +
                 "\n|0|   VOLVER AL MENÚ PRINCIPAL");
@@ -207,39 +218,57 @@ namespace Lkdin
         private static void SendMessage()
         {
             Console.WriteLine("ENVIAR MENSAJES");
-            string user = UsersMenu("mandar un mensaje:");
-            sender.SendBytes(Command.SendMessage, Console.ReadLine(), socketClient);
-            Console.WriteLine("\n MENSAJE ENVIADO CORRECTAMENTE");//TODO - Respuesta según servidor
+
+            string[] users = getUsers();
+
+            if (users.Length != 0)
+            {
+                string user = UsersMenu("mandar un mensaje:", getUsers());
+                sender.SendBytes(Command.SendMessage, Console.ReadLine(), socketClient);
+                Console.WriteLine("\n MENSAJE ENVIADO CORRECTAMENTE"); // TODO - Respuesta según servidor
+            }
+            else
+            {
+                Console.WriteLine("No hay usuarios ingresados en el sistema actualmente");
+            }
         }
 
         private static void Inbox()
         {
             Console.WriteLine("BANDEJA DE ENTRADA");
-            string user = UsersMenu("ver mensajes");
-            repeat:
-            Console.WriteLine("|1|   Ver mensajes nuevos" +
-            "\n|2|   Ver mensajes leídos");
+            string[] users = getUsers();
 
-            string option = Console.ReadLine();
-            if (option == "2")
+            if (users.Length != 0)
             {
-                sender.SendBytes(Command.ReadMessages, user + "-" + "readMessages", socketClient);
-            }
-            else if (option != "1" && option != "2")
-            {
-                Console.WriteLine("\n Debe ingresar solamenente 1 o 2");
-                goto repeat;
+                string user = UsersMenu("ver mensajes", users);
+                repeat:
+                Console.WriteLine("|1|   Ver mensajes nuevos" +
+                "\n|2|   Ver mensajes leídos");
+
+                string option = Console.ReadLine();
+                if (option == "2")
+                {
+                    sender.SendBytes(Command.ReadMessages, user + "-" + "readMessages", socketClient);
+                }
+                else if (option != "1" && option != "2")
+                {
+                    Console.WriteLine("\n Debe ingresar solamenente 1 o 2");
+                    goto repeat;
+                }
+                else
+                {
+                    sender.SendBytes(Command.ReadMessages, user + "-" + "newMessages", socketClient);
+                }
             }
             else
             {
-                sender.SendBytes(Command.ReadMessages, user + "-" + "newMessages", socketClient);
+                Console.WriteLine("No hay usuarios ingresados en el sistema actualmente");
             }
+            
         }
 
-        private static string UsersMenu(string action)
+        private static string UsersMenu(string action, string[] users)
         {
-            sender.SendBytes(Command.GetUsersName, socketClient);
-            string users = listener.Handler(socketClient);
 
             repeat:
             Console.WriteLine("Elija el usuario al que le desea " + action);
@@ -247,12 +276,21 @@ namespace Lkdin
 
             string userSelected = Console.ReadLine();
 
-            if (!users.Contains(userSelected)) { 
+            if (!users.Contains(userSelected))
+            {
                 Console.WriteLine("Verifique los datos ingresados");
                 goto repeat;
             }
 
             return userSelected;
+        }
+
+        private static string[] getUsers()
+        {
+            sender.SendBytes(Command.GetUsersName, socketClient);
+            string[] response = listener.Handler(socketClient).Split("#");
+            string[] users = (response.Length != 0 && response[0] != "") ? response[1].Split(";") : new string[] { };
+            return users;
         }
     }
 }
