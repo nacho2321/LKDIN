@@ -146,42 +146,32 @@ namespace Lkdin
             string jobProfileData = "";
             Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
             Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
+            string user = UsersMenu("asignar un perfil de trabajo:");
 
-            string[] users = getUsers();
+            Console.WriteLine("Descripción:");
+            jobProfileData += Console.ReadLine() + "-";
+            Console.WriteLine("Ubicación de la foto de perfil:");
+            jobProfileData += Console.ReadLine() + "-";
 
-            if (users.Length != 0)
+            Console.WriteLine("Habilidades:");
+            bool addAbilities = true;
+            while (addAbilities)
             {
-                string user = UsersMenu("asignar un perfil de trabajo:", getUsers());
+                Console.WriteLine("Agregue una Habilidad:");
+                jobProfileData += Console.ReadLine() + ";";
+                Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
 
-                Console.WriteLine("Descripción:");
-                jobProfileData += Console.ReadLine() + "-";
-                Console.WriteLine("Ubiación de la foto de perfil:");
-                jobProfileData += Console.ReadLine() + "-";
-
-                Console.WriteLine("Habilidades:");
-                bool addAbilities = true;
-                while (addAbilities)
+                string option = Console.ReadLine();
+                if (option == "0")
                 {
-                    Console.WriteLine("Agregue una Habilidad:");
-                    jobProfileData += Console.ReadLine() + ";";
-                    Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
-
-                    string option = Console.ReadLine();
-                    if (option == "0")
-                    {
-                        jobProfileData = jobProfileData.Remove(jobProfileData.Length - 1, 1);
-                        jobProfileData += "-";
-                        addAbilities = false;
-                    }
+                    jobProfileData = jobProfileData.Remove(jobProfileData.Length - 1, 1);
+                    jobProfileData += "-";
+                    addAbilities = false;
                 }
+            }
 
-                sender.SendBytes(Command.CreateJobProfile, jobProfileData, socketClient);
-                Console.WriteLine(listener.Handler(socketClient));
-            }
-            else
-            {
-                Console.WriteLine("No hay usuarios ingresados en el sistema actualmente");
-            }
+            sender.SendBytes(Command.CreateJobProfile, jobProfileData, socketClient);
+            Console.WriteLine(listener.Handler(socketClient));
         }
 
         private static void MessageMenu()
@@ -272,7 +262,8 @@ namespace Lkdin
 
             return userSelected;
         }
-        private static string[] getUsers()
+
+        private static string[] GetUsers()
         {
             sender.SendBytes(Command.GetUsersName, socketClient);
             string[] response = listener.Handler(socketClient).Split("#");
