@@ -137,8 +137,8 @@ namespace Lkdin
             Console.WriteLine("País:");
             userData += Console.ReadLine() + "-";
 
-            sender.SendBytes(Command.CreateUser, userData, socketClient);
-            Console.WriteLine(listener.Handler(socketClient));
+            sender.Send(Command.CreateUser, userData, socketClient);
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
         }
 
         private static void JobProfileMenu()
@@ -146,42 +146,32 @@ namespace Lkdin
             string jobProfileData = "";
             Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
             Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
+            string user = UsersMenu("asignar un perfil de trabajo:");
 
-            string[] users = getUsers();
+            Console.WriteLine("Descripción:");
+            jobProfileData += Console.ReadLine() + "-";
+            Console.WriteLine("Ubicación de la foto de perfil:");
+            jobProfileData += Console.ReadLine() + "-";
 
-            if (users.Length != 0)
+            Console.WriteLine("Habilidades:");
+            bool addAbilities = true;
+            while (addAbilities)
             {
-                string user = UsersMenu("asignar un perfil de trabajo:", getUsers());
+                Console.WriteLine("Agregue una Habilidad:");
+                jobProfileData += Console.ReadLine() + ";";
+                Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
 
-                Console.WriteLine("Descripción:");
-                jobProfileData += Console.ReadLine() + "-";
-                Console.WriteLine("Ubiación de la foto de perfil:");
-                jobProfileData += Console.ReadLine() + "-";
-
-                Console.WriteLine("Habilidades:");
-                bool addAbilities = true;
-                while (addAbilities)
+                string option = Console.ReadLine();
+                if (option == "0")
                 {
-                    Console.WriteLine("Agregue una Habilidad:");
-                    jobProfileData += Console.ReadLine() + ";";
-                    Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
-
-                    string option = Console.ReadLine();
-                    if (option == "0")
-                    {
-                        jobProfileData = jobProfileData.Remove(jobProfileData.Length - 1, 1);
-                        jobProfileData += "-";
-                        addAbilities = false;
-                    }
+                    jobProfileData = jobProfileData.Remove(jobProfileData.Length - 1, 1);
+                    jobProfileData += "-";
+                    addAbilities = false;
                 }
+            }
 
-                sender.SendBytes(Command.CreateJobProfile, jobProfileData, socketClient);
-                Console.WriteLine(listener.Handler(socketClient));
-            }
-            else
-            {
-                Console.WriteLine("No hay usuarios ingresados en el sistema actualmente");
-            }
+            sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
         }
 
         private static void MessageMenu()
@@ -222,8 +212,8 @@ namespace Lkdin
             Console.WriteLine("Escriba su mensaje: ");
             message = Console.ReadLine();
 
-            sender.SendBytes(Command.SendMessage, users+message, socketClient);
-            Console.WriteLine(listener.Handler(socketClient));
+            sender.Send(Command.SendMessage, users+message, socketClient);
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
         }
 
         private static void Inbox()
@@ -237,7 +227,7 @@ namespace Lkdin
             string option = Console.ReadLine();
             if (option == "2")
             {
-                sender.SendBytes(Command.ReadMessages, user + "-" + "readMessages", socketClient);
+                sender.Send(Command.ReadMessages, user + "-" + "readMessages", socketClient);
             }
             else if (option != "1" && option != "2")
             {
@@ -246,17 +236,17 @@ namespace Lkdin
             }
             else
             {
-                sender.SendBytes(Command.ReadMessages, user + "-" + "newMessages", socketClient);
+                sender.Send(Command.ReadMessages, user + "-" + "newMessages", socketClient);
             }
 
-            Console.WriteLine(listener.Handler(socketClient));
-            Console.WriteLine(listener.Handler(socketClient));
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
         }
 
         private static string UsersMenu(string action)
         {
-            sender.SendBytes(Command.GetUsersName, socketClient);
-            string users = listener.Handler(socketClient);
+            sender.Send(Command.GetUsersName, socketClient);
+            string users = listener.RecieveData(socketClient)[1];
 
             repeat:
             Console.WriteLine(action);
@@ -272,12 +262,6 @@ namespace Lkdin
 
             return userSelected;
         }
-        private static string[] getUsers()
-        {
-            sender.SendBytes(Command.GetUsersName, socketClient);
-            string[] response = listener.Handler(socketClient).Split("#");
-            string[] users = (response.Length != 0 && response[0] != "") ? response[1].Split(";") : new string[] {};
-            return users;
-        }
+
     }
 }

@@ -11,17 +11,23 @@ namespace LkdinServer.Logic
 
         public User CreateUser(string name, int age, List<string> professions, string country)
         {
-            User newUser = new User()
-            {
-                Name = name,
-                Age = age,
-                Professions = professions,
-                Country = country,
-                Profile = new JobProfile(),
-                Inbox = new List<Message>()
-            };
+            User newUser = null;
 
-            users.Add(newUser);
+            if (!Exists(name))
+            {
+                newUser = new User()
+                {
+                    Name = name,
+                    Age = age,
+                    Professions = professions,
+                    Country = country,
+                    Profile = new JobProfile(),
+                    Inbox = new List<Message>()
+                };
+
+                users.Add(newUser);
+
+            }
             return newUser;
         }
 
@@ -43,6 +49,11 @@ namespace LkdinServer.Logic
             }
 
             return userToReturn;
+        }
+
+        private bool Exists(string name)
+        {
+            return (GetUserByName(name) != null);
         }
 
         public void AssignJobProfile(string name, JobProfile jobProfile)

@@ -137,8 +137,8 @@ namespace Lkdin
             Console.WriteLine("País:");
             userData += Console.ReadLine() + "-";
 
-            sender.SendBytes(Command.CreateUser, userData, socketClient);
-            Console.WriteLine(listener.Handler(socketClient));
+            sender.Send(Command.CreateUser, userData, socketClient);
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
         }
 
         private static void JobProfileMenu()
@@ -170,8 +170,8 @@ namespace Lkdin
                 }
             }
 
-            sender.SendBytes(Command.CreateJobProfile, jobProfileData, socketClient);
-            Console.WriteLine(listener.Handler(socketClient));
+            sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
         }
 
         private static void MessageMenu()
@@ -212,8 +212,8 @@ namespace Lkdin
             Console.WriteLine("Escriba su mensaje: ");
             message = Console.ReadLine();
 
-            sender.SendBytes(Command.SendMessage, users+message, socketClient);
-            Console.WriteLine(listener.Handler(socketClient));
+            sender.Send(Command.SendMessage, users+message, socketClient);
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
         }
 
         private static void Inbox()
@@ -227,7 +227,7 @@ namespace Lkdin
             string option = Console.ReadLine();
             if (option == "2")
             {
-                sender.SendBytes(Command.ReadMessages, user + "-" + "readMessages", socketClient);
+                sender.Send(Command.ReadMessages, user + "-" + "readMessages", socketClient);
             }
             else if (option != "1" && option != "2")
             {
@@ -236,17 +236,17 @@ namespace Lkdin
             }
             else
             {
-                sender.SendBytes(Command.ReadMessages, user + "-" + "newMessages", socketClient);
+                sender.Send(Command.ReadMessages, user + "-" + "newMessages", socketClient);
             }
 
-            Console.WriteLine(listener.Handler(socketClient));
-            Console.WriteLine(listener.Handler(socketClient));
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
         }
 
         private static string UsersMenu(string action)
         {
-            sender.SendBytes(Command.GetUsersName, socketClient);
-            string users = listener.Handler(socketClient);
+            sender.Send(Command.GetUsersName, socketClient);
+            string users = listener.RecieveData(socketClient)[1];
 
             repeat:
             Console.WriteLine(action);
@@ -263,12 +263,5 @@ namespace Lkdin
             return userSelected;
         }
 
-        private static string[] GetUsers()
-        {
-            sender.SendBytes(Command.GetUsersName, socketClient);
-            string[] response = listener.Handler(socketClient).Split("#");
-            string[] users = (response.Length != 0 && response[0] != "") ? response[1].Split(";") : new string[] {};
-            return users;
-        }
     }
 }
