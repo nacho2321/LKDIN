@@ -146,7 +146,7 @@ namespace Lkdin
             string jobProfileData = "";
             Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
             Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
-            string user = UsersMenu("asignar un perfil de trabajo:");
+            string user = UsersMenu("Elija el usuario al que le desea asignar un perfil de trabajo:");
 
             Console.WriteLine("Descripción:");
             jobProfileData += Console.ReadLine() + "-";
@@ -261,6 +261,26 @@ namespace Lkdin
             }
 
             return userSelected;
+        }
+
+        private static string AssignJobProfilesMenu(string action)
+        {
+            sender.Send(Command.GetJobProfiles, socketClient);
+            string jobProfiles = listener.RecieveData(socketClient)[1];
+
+            repeat:
+            Console.WriteLine(action);
+            Console.WriteLine(jobProfiles);
+
+            string jobProfileSelected = Console.ReadLine();
+
+            if (!jobProfiles.Contains(jobProfileSelected))
+            {
+                Console.WriteLine("Verifique los datos ingresados");
+                goto repeat;
+            }
+
+            return jobProfileSelected;
         }
 
     }
