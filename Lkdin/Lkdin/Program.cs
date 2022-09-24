@@ -77,6 +77,7 @@ namespace Lkdin
                 case "3":
                     return true;
                 case "4":
+                    ShowJobProfiles();
                     return true;
                 case "5":
                     MessageMenu();
@@ -146,31 +147,10 @@ namespace Lkdin
             string jobProfileData = "";
             Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
             Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
-            string user = UsersMenu("Elija el usuario al que le desea asignar un perfil de trabajo:");
+            jobProfileData += UsersMenu("Elija el usuario al que le desea asignar un perfil de trabajo:") + "-";
+            jobProfileData += AssignJobProfilesMenu("Elija el perfil de trabajo: ");
 
-            Console.WriteLine("Descripción:");
-            jobProfileData += Console.ReadLine() + "-";
-            Console.WriteLine("Ubicación de la foto de perfil:");
-            jobProfileData += Console.ReadLine() + "-";
-
-            Console.WriteLine("Habilidades:");
-            bool addAbilities = true;
-            while (addAbilities)
-            {
-                Console.WriteLine("Agregue una Habilidad:");
-                jobProfileData += Console.ReadLine() + ";";
-                Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
-
-                string option = Console.ReadLine();
-                if (option == "0")
-                {
-                    jobProfileData = jobProfileData.Remove(jobProfileData.Length - 1, 1);
-                    jobProfileData += "-";
-                    addAbilities = false;
-                }
-            }
-
-            sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
+            sender.Send(Command.AssignJobProfile, jobProfileData, socketClient);
             Console.WriteLine(listener.RecieveData(socketClient)[1]);
         }
 
@@ -271,17 +251,63 @@ namespace Lkdin
             repeat:
             Console.WriteLine(action);
             Console.WriteLine(jobProfiles);
+            Console.WriteLine("                         |0|    AGREGAR NUEVO PERFIL DE TRABAJO");
 
-            string jobProfileSelected = Console.ReadLine();
+            string data = Console.ReadLine();
 
-            if (!jobProfiles.Contains(jobProfileSelected))
+            if (!jobProfiles.Contains(data))
             {
                 Console.WriteLine("Verifique los datos ingresados");
                 goto repeat;
             }
+            else if (data == "0")
+            {
+                data = CreateJobProfile();
+            }
 
-            return jobProfileSelected;
+            return data;
         }
 
+        private static string CreateJobProfile()
+        {
+            string name = "";
+
+            string jobProfileData = "";
+            Console.WriteLine("Nombre:");
+            jobProfileData += Console.ReadLine() + "-";
+            name = jobProfileData;
+            Console.WriteLine("Descripción:");
+            jobProfileData += Console.ReadLine() + "-";
+            Console.WriteLine("Ubicación de la foto de perfil:");
+            Console.WriteLine("Ubicación de la foto de perfil:");
+            jobProfileData += Console.ReadLine() + "-";
+
+            Console.WriteLine("Habilidades:");
+            bool addAbilities = true;
+            while (addAbilities)
+            {
+                Console.WriteLine("Agregue una Habilidad:");
+                jobProfileData += Console.ReadLine() + ";";
+                Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
+
+                string option = Console.ReadLine();
+                if (option == "0")
+                {
+                    jobProfileData = jobProfileData.Remove(jobProfileData.Length - 1, 1);
+                    jobProfileData += "-";
+                    addAbilities = false;
+                }
+            }
+            sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
+
+            return name;
+        }
+
+        private static void ShowJobProfiles()
+        {
+            sender.Send(Command.GetJobProfiles, socketClient);
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
+        }
     }
 }
