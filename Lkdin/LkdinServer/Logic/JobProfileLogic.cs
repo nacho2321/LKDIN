@@ -1,6 +1,7 @@
 ﻿using LKDIN_Server.Domain;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace LkdinServer.Logic
@@ -9,16 +10,32 @@ namespace LkdinServer.Logic
     {
         private List<JobProfile> jobProfiles = new List<JobProfile>();
 
-        public void CreateJobProfile(string description, string imagePath, List<string> abilities)
+        public JobProfile CreateJobProfile(string name, string description, string imagePath, List<string> abilities)
         {
-            JobProfile newJobProfile = new JobProfile()
-            {
-                Abilities = abilities,
-                Description = description,
-                ImagePath = imagePath
-            };
+            JobProfile newJobProfile = null;
 
-            jobProfiles.Add(newJobProfile);
+            if (!Exists(name)) { 
+                newJobProfile = new JobProfile()
+                {
+                    Name = name,
+                    Abilities = abilities,
+                    Description = description,
+                    ImagePath = imagePath
+                };
+                jobProfiles.Add(newJobProfile);
+            }
+            return newJobProfile;
         }
+
+        private bool Exists(string profileName)
+        {
+            return (this.GetJobProfile(profileName) != null);
+        }
+
+        public JobProfile GetJobProfile(string profileName)
+        {
+            return jobProfiles.FirstOrDefault(p => p.Name == profileName);
+        }
+
     }
 }

@@ -5,6 +5,9 @@ namespace LKDIN_Server.Domain
 {
     public class JobProfile
     {
+        public const int NameMinLength = 2;
+        public const int NameMaxLength = 50;
+
         public const int AbilityMinLength = 3;
         public const int AbilityMaxLength = 50;
 
@@ -14,16 +17,21 @@ namespace LKDIN_Server.Domain
         public const int ImagePathMinLength = 3;
         public const int ImagePathMaxLength = 550;
 
+        private string name;
         private List<string> abilities;
         private string description;
         private string imagePath;
 
-        public List<string> Abilities
+        public string Name
         {
-            get => this.abilities;
+            get => this.name;
             set
             {
-                this.abilities = value ?? throw new ArgumentNullException("La lista de habilidades no puede ser null");
+                if (value?.Length < NameMinLength || value?.Length > NameMaxLength)
+                {
+                    throw new DomainException($"El nombre del perfil de trabajo debe tener entre {NameMinLength} y {NameMaxLength} caracteres de largo");
+                }
+                this.name = value ?? throw new ArgumentNullException("El nombre no puede ser null");
             }
         }
 
@@ -37,6 +45,15 @@ namespace LKDIN_Server.Domain
                     throw new DomainException($"El largo de la descripción debe estar entre {DescriptionMinLength} y {DescriptionMaxLength}");
                 }
                 this.description = value ?? throw new ArgumentNullException("La descripción no puede ser null");
+            }
+        }
+
+        public List<string> Abilities
+        {
+            get => this.abilities;
+            set
+            {
+                this.abilities = value ?? throw new ArgumentNullException("La lista de habilidades no puede ser null");
             }
         }
 

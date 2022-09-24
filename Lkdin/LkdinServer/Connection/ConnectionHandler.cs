@@ -97,9 +97,11 @@ namespace LkdinServer.Connection
                         break;
 
                     case Command.CreateJobProfile:
-                        jobProfileLogic.CreateJobProfile(splittedData[0], splittedData[1], splittedData[2].Split(";").ToList());
-
-                        sender.Send(Command.CreateJobProfile, "PERFIL DE TRABAJO CREADO CORRECTAMENTE", socket);
+                        JobProfile newJobProfile = jobProfileLogic.CreateJobProfile(splittedData[0], splittedData[1], splittedData[2], splittedData[3].Split(";").ToList());
+                        cmd = (newJobProfile != null) ? Command.CreateJobProfile : Command.ThrowException;
+                        messageToReturn = (newJobProfile != null) ? "PERFIL DE TRABAJO CREADO CORRECTAMENTE" : "EL PERFIL DE TRABAJO YA EXISTE";
+                        
+                        sender.Send(cmd, messageToReturn, socket);
                         break;
 
                     case Command.SendMessage:
@@ -140,6 +142,9 @@ namespace LkdinServer.Connection
                     sender.Send(Command.ThrowException, ex.Message, socket);
                 }
             }
+
+            
         }
+
     }
 }
