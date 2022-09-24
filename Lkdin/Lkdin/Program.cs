@@ -226,46 +226,57 @@ namespace Lkdin
         private static string UsersMenu(string action)
         {
             sender.Send(Command.GetUsersName, socketClient);
-            string users = listener.RecieveData(socketClient)[1];
+            string data = listener.RecieveData(socketClient)[1];
+            List<string> users = data.Split(';').ToList();
 
             repeat:
             Console.WriteLine(action);
-            Console.WriteLine(users);
+            for (int i = 0; i < users.Count; i++)
+            {
+                Console.WriteLine("|"+ i + "| " + users[i]);
+            }
 
             string userSelected = Console.ReadLine();
 
-            if (!users.Contains(userSelected))
+            if (!Regex.IsMatch(userSelected, @"^[0-9]+$") || Int32.Parse(userSelected) >= users.Count || Int32.Parse(userSelected) < 0)
             {
                 Console.WriteLine("Verifique los datos ingresados");
                 goto repeat;
             }
 
-            return userSelected;
+
+            return users[Int32.Parse(userSelected)];
         }
 
         private static string AssignJobProfilesMenu(string action)
         {
             sender.Send(Command.GetJobProfiles, socketClient);
-            string jobProfiles = listener.RecieveData(socketClient)[1];
+            string dataJobProfiles = listener.RecieveData(socketClient)[1];
+            List<string> jobProfiles = dataJobProfiles.Split(';').ToList();
 
             repeat:
             Console.WriteLine(action);
-            Console.WriteLine(jobProfiles);
-            Console.WriteLine("                         |0|    AGREGAR NUEVO PERFIL DE TRABAJO");
+            for (int i = 0; i < jobProfiles.Count && jobProfiles.Count > 111; i++)
+            {
+                Console.WriteLine("|" + i + "| " + jobProfiles[i]);
+            }
+
+            Console.WriteLine("-------------------------------------------------------------");
+            Console.WriteLine("|" + jobProfiles.Count +"| AGREGAR NUEVO PERFIL DE TRABAJO");
 
             string data = Console.ReadLine();
 
-            if (!jobProfiles.Contains(data))
+            if (!Regex.IsMatch(data, @"^[0-9]+$") || Int32.Parse(data) > jobProfiles.Count|| Int32.Parse(data) < 0)
             {
                 Console.WriteLine("Verifique los datos ingresados");
                 goto repeat;
             }
-            else if (data == "0")
+            else if (Int32.Parse(data) == (jobProfiles.Count ))
             {
                 data = CreateJobProfile();
             }
 
-            return data;
+            return jobProfiles[Int32.Parse(data)];
         }
 
         private static string CreateJobProfile()
@@ -278,7 +289,6 @@ namespace Lkdin
             name = jobProfileData;
             Console.WriteLine("Descripción:");
             jobProfileData += Console.ReadLine() + "-";
-            Console.WriteLine("Ubicación de la foto de perfil:");
             Console.WriteLine("Ubicación de la foto de perfil:");
             jobProfileData += Console.ReadLine() + "-";
 
