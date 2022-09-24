@@ -65,5 +65,6 @@ public enum Command
     ReadMessages,
     GetUsersName,
     GetJobProfiles,
+    AssignJobProfile,
     ThrowException
 }

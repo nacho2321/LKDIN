@@ -142,9 +142,6 @@ namespace LkdinServer.Connection
                     sender.Send(Command.ThrowException, ex.Message, socket);
                 }
             }
-
-            
         }
-
     }
 }
