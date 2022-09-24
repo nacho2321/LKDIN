@@ -256,9 +256,13 @@ namespace Lkdin
 
             repeat:
             Console.WriteLine(action);
-            for (int i = 0; i < jobProfiles.Count && jobProfiles.Count > 111; i++)
+
+            if (jobProfiles[0] != "")
             {
-                Console.WriteLine("|" + i + "| " + jobProfiles[i]);
+                for (int i = 0; i < jobProfiles.Count; i++)
+                {
+                    Console.WriteLine("|" + i + "| " + jobProfiles[i]);
+                }
             }
 
             Console.WriteLine("-------------------------------------------------------------");
@@ -266,14 +270,14 @@ namespace Lkdin
 
             string data = Console.ReadLine();
 
-            if (!Regex.IsMatch(data, @"^[0-9]+$") || Int32.Parse(data) > jobProfiles.Count|| Int32.Parse(data) < 0)
+            if (!Regex.IsMatch(data, @"^[0-9]+$") || Int32.Parse(data) > jobProfiles.Count|| Int32.Parse(data) < 0 || (Int32.Parse(data) == 0 && jobProfiles[0] == ""))
             {
                 Console.WriteLine("Verifique los datos ingresados");
                 goto repeat;
             }
             else if (Int32.Parse(data) == (jobProfiles.Count ))
             {
-                data = CreateJobProfile();
+                return CreateJobProfile();
             }
 
             return jobProfiles[Int32.Parse(data)];

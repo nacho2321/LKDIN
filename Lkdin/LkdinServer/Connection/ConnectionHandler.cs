@@ -125,10 +125,10 @@ namespace LkdinServer.Connection
                         sender.Send(Command.GetJobProfiles, joinedJobProfiles, socket);
                         break;
 
-                    case Command.AssignJobProfile:
-                        JobProfile jobProfile = jobProfileLogic.GetJobProfile(splittedData[1]);
-                        userLogic.AssignJobProfile(splittedData[0], jobProfile);
-                        sender.Send(Command.AssignJobProfile, "PERFIL DE TRABAJO ASIGNADO CORRECTAMENTE", socket);
+                    case Command.AssignJobProfile: 
+                        JobProfile jobProfile = jobProfileLogic.GetJobProfile(splittedData[1]); 
+                        userLogic.AssignJobProfile(splittedData[0], jobProfile); 
+                        CreationResponseHandler(Command.AssignJobProfile, jobProfile, "PERFIL DE TRABAJO ASIGNADO CORRECTAMENTE", "ERROR AL ASIGNAR, INTENTE NUEVAMENTE", socket); 
                         break;
                 }
             }
