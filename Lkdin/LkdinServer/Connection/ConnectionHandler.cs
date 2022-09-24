@@ -118,6 +118,18 @@ namespace LkdinServer.Connection
                         string joinedNames = String.Join("; ", usersName.ToArray());
                         sender.Send(Command.GetUsersName, joinedNames, socket);
                         break;
+
+                    case Command.GetJobProfiles:
+                        List<string> jobProfiles = jobProfileLogic.GetJobProfiles();
+                        string joinedJobProfiles = String.Join("; ", jobProfiles.ToArray());
+                        sender.Send(Command.GetJobProfiles, joinedJobProfiles, socket);
+                        break;
+
+                    case Command.AssignJobProfile:
+                        JobProfile jobProfile = jobProfileLogic.GetJobProfile(splittedData[1]);
+                        userLogic.AssignJobProfile(splittedData[0], jobProfile);
+                        sender.Send(Command.AssignJobProfile, "PERFIL DE TRABAJO ASIGNADO CORRECTAMENTE", socket);
+                        break;
                 }
             }
             catch (Exception ex)
@@ -127,7 +139,6 @@ namespace LkdinServer.Connection
                     sender.Send(Command.ThrowException, ex.Message, socket);
                 }
             }
-
         }
 
         private void CreationResponseHandler(Command cmd, Object obj, string OkResponse, string errorResponse, Socket socket)

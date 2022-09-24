@@ -37,5 +37,16 @@ namespace LkdinServer.Logic
             return jobProfiles.FirstOrDefault(p => p.Name == profileName);
         }
 
+        public List<string> GetJobProfiles()
+        {
+            List<string> data = new List<string>();
+            for (int i = 0; i < jobProfiles.Count; i++)
+            {
+                data.Add(jobProfiles[i].Name);
+            }
+
+            return data;
+        }
+
     }
 }
