@@ -90,38 +90,24 @@ namespace LkdinServer.Connection
                 {
                     case Command.CreateUser:
                         User newUser = userLogic.CreateUser(splittedData[0], Int32.Parse(splittedData[1]), splittedData[2].Split(";").ToList(), splittedData[3]);
-                        Command cmd = (newUser != null) ? Command.CreateUser : Command.ThrowException;
-                        string messageToReturn = (newUser != null) ? "USUARIO CREADO CORRECTAMENTE" : "YA EXISTE EL USUARIO";
-
-                        sender.Send(cmd, messageToReturn, socket);
+                        CreationResponseHandler(Command.CreateUser, newUser, "USUARIO CREADO CORRECTAMENTE", "YA EXISTE EL USUARIO", socket);
                         break;
 
                     case Command.CreateJobProfile:
                         JobProfile newJobProfile = jobProfileLogic.CreateJobProfile(splittedData[0], splittedData[1], splittedData[2], splittedData[3].Split(";").ToList());
-                        cmd = (newJobProfile != null) ? Command.CreateJobProfile : Command.ThrowException;
-                        messageToReturn = (newJobProfile != null) ? "PERFIL DE TRABAJO CREADO CORRECTAMENTE" : "EL PERFIL DE TRABAJO YA EXISTE";
-                        
-                        sender.Send(cmd, messageToReturn, socket);
+                        CreationResponseHandler(Command.CreateJobProfile, newJobProfile, "PERFIL DE TRABAJO CREADO CORRECTAMENTE", "EL PERFIL DE TRABAJO YA EXISTE", socket);
                         break;
 
                     case Command.SendMessage:
-                        User userSender = userLogic.GetUserByName(splittedData[0]);
-                        User userReceptor = userLogic.GetUserByName(splittedData[1]);
-                        messageLogic.CreateMessage(userSender, userReceptor, splittedData[2]);
+                        User userSender = userLogic.GetUserByName(splittedData[0]), userReceptor = userLogic.GetUserByName(splittedData[1]);
 
+                        messageLogic.CreateMessage(userSender, userReceptor, splittedData[2]);
                         sender.Send(Command.CreateJobProfile, "MENSAJE ENVIADO CORRECTAMENTE", socket);
                         break;
 
                     case Command.ReadMessages:
-                        string messages = "";
-                        if (splittedData[1].Contains("readMessages"))
-                        {
-                            messages = userLogic.ShowMessages(splittedData[0], true);
-                        }
-                        else
-                        {
-                            messages = userLogic.ShowMessages(splittedData[0], false);
-                        }
+                        bool readMessages = splittedData[1].Contains("readMessages");
+                        string messages = userLogic.ShowMessages(splittedData[0], readMessages);
 
                         sender.Send(Command.ReadMessages, messages, socket);
                         sender.Send(Command.ReadMessages, "MENSAJES MOSTRADOS CORRECTAMENTE", socket);
@@ -131,7 +117,6 @@ namespace LkdinServer.Connection
                         List<string> usersName = userLogic.GetUsersName();
                         string joinedNames = String.Join("; ", usersName.ToArray());
                         sender.Send(Command.GetUsersName, joinedNames, socket);
-
                         break;
                 }
             }
@@ -143,8 +128,15 @@ namespace LkdinServer.Connection
                 }
             }
 
-            
         }
 
+        private void CreationResponseHandler(Command cmd, Object obj, string OkResponse, string errorResponse, Socket socket)
+        {
+            bool objCreated = obj != null;
+            Command cmdToRespond = (objCreated) ? cmd : Command.ThrowException;
+            string messageToReturn = (objCreated) ? OkResponse : errorResponse;
+
+            sender.Send(cmdToRespond, messageToReturn, socket);
+        }
     }
 }
