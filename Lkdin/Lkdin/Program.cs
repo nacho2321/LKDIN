@@ -16,6 +16,7 @@ namespace Lkdin
         static Listener listener = new Listener();
         static readonly SettingsManager settingsMngr = new SettingsManager();
         static Socket socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        static int specialCharactersUsed = 0;
 
         static void Main(string[] args)
         {
@@ -44,8 +45,7 @@ namespace Lkdin
             {
 
                 Console.WriteLine("No se ha podido conectar con el servidor, reinicie la aplicación e intente nuevamente");
-            }
-              
+            } 
         }
 
         private static bool MainMenu()
@@ -100,7 +100,7 @@ namespace Lkdin
 
             Console.WriteLine("Nombre:");
             userData += Console.ReadLine() + "-";
-
+            specialCharactersUsed++;
             Console.WriteLine("Edad:");
             string age = Console.ReadLine();
             while (!Regex.IsMatch(age, @"^[0-9]+$"))
@@ -108,9 +108,8 @@ namespace Lkdin
                 Console.WriteLine("Debe ingresar solamente números");
                 age = Console.ReadLine();
             }
-
             userData += age + "-";
-
+            specialCharactersUsed++;
             Console.WriteLine("Profesiones:");
             bool addProfessions = true;
             while (addProfessions)
@@ -133,13 +132,19 @@ namespace Lkdin
                     Console.WriteLine("\n Debe ingresar solamenente 1 o 0");
                     goto repeat;
                 }
+                specialCharactersUsed++;
             }
 
             Console.WriteLine("País:");
             userData += Console.ReadLine() + "-";
+            specialCharactersUsed++;
 
-            sender.Send(Command.CreateUser, userData, socketClient);
-            Console.WriteLine(listener.RecieveData(socketClient)[1]);
+            if (!ContainsSpecialCharacters(userData, specialCharactersUsed))
+            {
+                sender.Send(Command.CreateUser, userData, socketClient);
+                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+            }
+            specialCharactersUsed = 0;
         }
 
         private static void JobProfileMenu()
@@ -192,8 +197,12 @@ namespace Lkdin
             Console.WriteLine("Escriba su mensaje: ");
             message = Console.ReadLine();
 
-            sender.Send(Command.SendMessage, users+message, socketClient);
-            Console.WriteLine(listener.RecieveData(socketClient)[1]);
+            if (!ContainsSpecialCharacters(message, 0))
+            {
+                sender.Send(Command.SendMessage, users + message, socketClient);
+                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+            }
+            specialCharactersUsed = 0;
         }
 
         private static void Inbox()
@@ -285,17 +294,20 @@ namespace Lkdin
 
         private static string CreateJobProfile()
         {
+            repeat:
+            Console.WriteLine("CREACIÓN DE PERFILES DE TRABAJO");
             string name = "";
-
             string jobProfileData = "";
             Console.WriteLine("Nombre:");
             jobProfileData += Console.ReadLine() + "-";
             name = jobProfileData;
+            specialCharactersUsed++;
             Console.WriteLine("Descripción:");
             jobProfileData += Console.ReadLine() + "-";
+            specialCharactersUsed++;
             Console.WriteLine("Ubicación de la foto de perfil:");
             jobProfileData += Console.ReadLine() + "-";
-
+            specialCharactersUsed++;
             Console.WriteLine("Habilidades:");
             bool addAbilities = true;
             while (addAbilities)
@@ -311,9 +323,19 @@ namespace Lkdin
                     jobProfileData += "-";
                     addAbilities = false;
                 }
+                specialCharactersUsed++;
             }
-            sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
-            Console.WriteLine(listener.RecieveData(socketClient)[1]);
+
+            if (!ContainsSpecialCharacters(jobProfileData, specialCharactersUsed))
+            {
+                specialCharactersUsed = 0;
+                sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
+                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+            }
+            else {
+                specialCharactersUsed = 0;
+                goto repeat;
+            }
 
             return name;
         }
@@ -322,6 +344,20 @@ namespace Lkdin
         {
             sender.Send(Command.GetJobProfiles, socketClient);
             Console.WriteLine(listener.RecieveData(socketClient)[1]);
+        }
+
+        private static bool ContainsSpecialCharacters(string data, int charactersUsedBySystem)
+        {
+            bool contains = false;
+            int freq = data.Where(x => (x == '|') || (x == ';') || (x == '-')).Count();
+
+            if (freq > charactersUsedBySystem)
+            {
+                contains = true;
+                Console.WriteLine("Los datos que usted ingrese no pueden contener: ; | -");
+            }
+
+            return contains;
         }
     }
 }
