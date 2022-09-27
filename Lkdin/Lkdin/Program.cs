@@ -62,8 +62,9 @@ namespace Lkdin
             Console.WriteLine("                           |1|   CREAR USUARIO");
             Console.WriteLine("                           |2|   CREAR PERFIL DE TRABAJO DE USUARIO");
             Console.WriteLine("                           |3|   AÑADIR FOTO A PERFIL DE TRABAJO");
-            Console.WriteLine("                           |4|   MOSTRAR PERFILES DE TRABAJO EXISTENTES");
-            Console.WriteLine("                           |5|   MENSAJES");
+            Console.WriteLine("                           |4|   MOSTRAR PERFIL DE TRABAJO ESPECÍFICO");
+            Console.WriteLine("                           |5|   MOSTRAR PERFILES DE TRABAJO EXISTENTES");
+            Console.WriteLine("                           |6|   MENSAJES");
             Console.WriteLine("                           |0|   SALIR");
 
             switch (Console.ReadLine())
@@ -77,9 +78,12 @@ namespace Lkdin
                 case "3":
                     return true;
                 case "4":
-                    ShowJobProfiles();
+                    ConsultSpecificProfile();
                     return true;
                 case "5":
+                    ShowJobProfiles();
+                    return true;
+                case "6":
                     MessageMenu();
                     return true;
                 case "0":
@@ -253,7 +257,6 @@ namespace Lkdin
                 goto repeat;
             }
 
-
             return users[Int32.Parse(userSelected)];
         }
 
@@ -314,6 +317,8 @@ namespace Lkdin
             {
                 Console.WriteLine("Agregue una Habilidad:");
                 jobProfileData += Console.ReadLine() + ";";
+                Console.WriteLine("PRESIONE: ");
+                Console.WriteLine("\n                         |Cualquier tecla|    SEGUIR AGREGANDO HABILIDADES");
                 Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
 
                 string option = Console.ReadLine();
@@ -338,6 +343,13 @@ namespace Lkdin
             }
 
             return name;
+        }
+
+        private static void ConsultSpecificProfile()
+        {
+            string user = UsersMenu("Elija el usuario que desea ver el perfil de trabajo:");
+            sender.Send(Command.GetSpecificProfile, user, socketClient);
+            Console.WriteLine(listener.RecieveData(socketClient)[1]);
         }
 
         private static void ShowJobProfiles()

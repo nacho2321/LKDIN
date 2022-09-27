@@ -1,6 +1,7 @@
 ﻿using LKDIN_Server.Domain;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace LkdinServer.Logic
@@ -62,6 +63,21 @@ namespace LkdinServer.Logic
 
             userToAssign.Profile = jobProfile;
         }
+
+        public string ShowSpecificProfile(string user)
+        {
+            JobProfile jobProfile = users.FirstOrDefault( x => x.Name == user).Profile;
+
+            string profile = "NOMBRE: " + jobProfile.Name + "\n DESCRIPCIÓN: " + jobProfile.Description +  "\n FOTO DE PERFIL: " + jobProfile.ImagePath + "\n HABILIDADES: ";
+
+            for (int i = 0; i < jobProfile.Abilities.Count; i++)
+            {
+                profile += "\n" + "|" + i + "|" + jobProfile.Abilities[i];
+            }
+
+            return profile;
+        }
+
 
         public List<string> GetUsersName()
         {

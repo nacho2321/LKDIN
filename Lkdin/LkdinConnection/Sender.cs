@@ -66,5 +66,6 @@ public enum Command
     GetUsersName,
     GetJobProfiles,
     AssignJobProfile,
+    GetSpecificProfile,
     ThrowException
 }

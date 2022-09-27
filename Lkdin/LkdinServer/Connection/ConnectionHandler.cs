@@ -125,6 +125,11 @@ namespace LkdinServer.Connection
                         sender.Send(Command.GetJobProfiles, joinedJobProfiles, socket);
                         break;
 
+                    case Command.GetSpecificProfile:
+                        string specificProfile = userLogic.ShowSpecificProfile(splittedData[0]);
+                        sender.Send(Command.GetSpecificProfile, specificProfile, socket);
+                        break;
+
                     case Command.AssignJobProfile: 
                         JobProfile jobProfile = jobProfileLogic.GetJobProfile(splittedData[1]); 
                         userLogic.AssignJobProfile(splittedData[0], jobProfile); 
