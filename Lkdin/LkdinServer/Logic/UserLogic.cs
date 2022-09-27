@@ -108,7 +108,7 @@ namespace LkdinServer.Logic
                 if (!messages[i].Read && !readMessages)
                 {
                     filteredMessages += "DESTINATARIO: " + messages[i].Sender.Name + "\n" + messages[i].Content;
-                    messages[i].Read = true;
+                    messages[i].ReadMessage();
                 }
                 else if (messages[i].Read && readMessages)
                 {
