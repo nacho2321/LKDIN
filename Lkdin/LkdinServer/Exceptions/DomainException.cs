@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace LKDIN_Server.Domain
+namespace LKDIN_Server.Exceptions
 {
     [Serializable]
     public class DomainException : Exception

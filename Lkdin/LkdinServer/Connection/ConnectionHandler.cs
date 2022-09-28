@@ -1,4 +1,5 @@
 ﻿using LKDIN_Server.Domain;
+using LKDIN_Server.Exceptions;
 using LkdinConnection;
 using LkdinServer.Logic;
 using System;
@@ -6,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Threading;
 
 namespace LkdinServer.Connection
@@ -134,6 +134,10 @@ namespace LkdinServer.Connection
                         JobProfile jobProfile = jobProfileLogic.GetJobProfile(splittedData[1]); 
                         userLogic.AssignJobProfile(splittedData[0], jobProfile); 
                         CreationResponseHandler(Command.AssignJobProfile, jobProfile, "PERFIL DE TRABAJO ASIGNADO CORRECTAMENTE", "ERROR AL ASIGNAR, INTENTE NUEVAMENTE", socket); 
+                        break;
+
+                    case Command.SendFile:
+                        this.listener.RecieveData(socket);
                         break;
                 }
             }

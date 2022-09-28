@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LKDIN_Server.Exceptions;
+using System;
 using System.Collections.Generic;
 
 namespace LKDIN_Server.Domain

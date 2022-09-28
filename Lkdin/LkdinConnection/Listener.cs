@@ -7,24 +7,53 @@ namespace LkdinConnection
 {
     public class Listener
     {
-        const int protocolDataLength = 4; //TODO Pasar a archivo global accesible por los dos proyectos
-        const int protocolCmdLength = 1; //TODO Pasar a archivo global accesible por los dos proyectos
+        private readonly int protocolDataLength;
+        private readonly int maxPacketSize;
+        private readonly int protocolCmdLength;
+        private readonly int fixedFileSize;
+        private readonly FileStreamHandler fileStreamHandler;
 
+        public Listener()
+        {
+            this.protocolDataLength = Protocol.protocolDataLength;
+            this.maxPacketSize = Protocol.MaxPacketSize;
+            this.protocolCmdLength = Protocol.protocolCmdLength;
+            this.fixedFileSize = Protocol.FixedFileSize;
+
+            this.fileStreamHandler = new FileStreamHandler();
+        }
+        
         public string[] RecieveData(Socket socket)
         {
+            string[] ret = new string[2];
             int headerLength = protocolCmdLength + protocolDataLength;
             byte[] header = BytesReciever(headerLength, socket);
 
             string headerToString = Encoding.UTF8.GetString(header);
-            int length = Int32.Parse(headerToString.Substring(protocolCmdLength));
-            byte[] data = BytesReciever(length, socket);
-
             string order = headerToString.Substring(0, protocolCmdLength);
-            string[] ret = new string[2];
-            ret[0] = order;
-            ret[1] = Encoding.UTF8.GetString(data);
+            if ((Command)Int32.Parse(order) != Command.SendMessage)
+            {
+                int length = Int32.Parse(headerToString.Substring(protocolCmdLength));
+                byte[] data = BytesReciever(length, socket);
 
+                
+                ret[0] = order;
+                ret[1] = Encoding.UTF8.GetString(data);
+            }
+            else
+            {
+                int fileNameSize = Int32.Parse(headerToString.Substring(protocolCmdLength));
+                RecieveFile(fileNameSize, socket);
+            }
+            
             return ret;
+        }
+
+        public void RecieveFile(int fileNameSize, Socket socket)
+        {
+            string fileName = Encoding.UTF8.GetString(BytesReciever(fileNameSize, socket));
+            long fileSize = BitConverter.ToInt64(BytesReciever(fixedFileSize, socket));
+            FileStreamReciever(fileSize, fileName, socket);
         }
 
         private byte[] BytesReciever(int length, Socket socket)
@@ -42,5 +71,31 @@ namespace LkdinConnection
             }
             return response;
         }
+
+        private void FileStreamReciever(long fileSize, string fileName, Socket socket)
+        {
+            long fileParts = Protocol.FileParts(fileSize);
+            long offset = 0;
+            long currentPart = 1;
+
+            while (fileSize > offset)
+            {
+                byte[] data;
+                if (currentPart == fileParts)
+                {
+                    var lastPartSize = (int)(fileSize - offset);
+                    data = BytesReciever(lastPartSize, socket);
+                    offset += lastPartSize;
+                }
+                else
+                {
+                    data = BytesReciever(Protocol.MaxPacketSize, socket);
+                    offset += Protocol.MaxPacketSize;
+                }
+                fileStreamHandler.Write(fileName, data);
+                currentPart++;
+            }
+        }
+
     }
 }

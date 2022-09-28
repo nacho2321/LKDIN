@@ -309,7 +309,8 @@ namespace Lkdin
             jobProfileData += Console.ReadLine() + "-";
             specialCharactersUsed++;
             Console.WriteLine("Ubicación de la foto de perfil:");
-            jobProfileData += Console.ReadLine() + "-";
+            string path = Console.ReadLine();
+            jobProfileData += path + "-";
             specialCharactersUsed++;
             Console.WriteLine("Habilidades:");
             bool addAbilities = true;
@@ -334,6 +335,7 @@ namespace Lkdin
             if (!ContainsSpecialCharacters(jobProfileData, specialCharactersUsed))
             {
                 specialCharactersUsed = 0;
+                sender.SendFile(path, socketClient);
                 sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
                 Console.WriteLine(listener.RecieveData(socketClient)[1]);
             }
