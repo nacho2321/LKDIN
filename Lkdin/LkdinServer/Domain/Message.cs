@@ -41,7 +41,7 @@ namespace LKDIN_Server.Domain
             get => this.content;
             set
             {
-                this.content = value;
+                this.content = value ?? throw new ArgumentNullException("El mensaje no puede ser null");
             }
         }
 

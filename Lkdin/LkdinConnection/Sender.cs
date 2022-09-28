@@ -36,7 +36,6 @@ namespace LkdinConnection
 
             BytesSender(headerData, socket);    // Primero envia header con orden y largo de datos
             BytesSender(data, socket);          // Luego envia los datos (el mensaje)
-
         }
 
         public void SendFile(string path, Socket socket)
@@ -67,28 +66,32 @@ namespace LkdinConnection
             int zerosToAdd = protocolDataLength - dataLengthBytes;
 
             string lengthOfMessage = "";
+
             for (int i = 0; i < zerosToAdd; i++)
             {
                 lengthOfMessage += "0";
             }
+
             lengthOfMessage += messageLength.ToString();
             string header = (int)order + lengthOfMessage;
 
             return Encoding.UTF8.GetBytes(header);
-
         }
 
         private void BytesSender(byte[] data, Socket socket)
         {
             int offset = 0;
             int size = data.Length;
+
             while (offset < size)
             {
                 int sent = socket.Send(data, offset, size - offset, SocketFlags.None);
+
                 if (sent == 0)
                 {
                     throw new SocketException();
                 }
+
                 offset += sent;
             }
         }

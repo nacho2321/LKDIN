@@ -12,24 +12,27 @@ namespace LkdinServer.Logic
 
         public User CreateUser(string name, int age, List<string> professions, string country)
         {
-            User newUser = null;
-
-            if (!Exists(name))
+            lock (users)
             {
-                newUser = new User()
+                User newUser = null;
+
+                if (!Exists(name))
                 {
-                    Name = name,
-                    Age = age,
-                    Professions = professions,
-                    Country = country,
-                    Profile = new JobProfile(),
-                    Inbox = new List<Message>()
-                };
+                    newUser = new User()
+                    {
+                        Name = name,
+                        Age = age,
+                        Professions = professions,
+                        Country = country,
+                        Profile = new JobProfile(),
+                        Inbox = new List<Message>()
+                    };
 
-                users.Add(newUser);
+                    users.Add(newUser);
+                }
 
+                return newUser;
             }
-            return newUser;
         }
 
         internal void AddMessage(Message newMessage, User receptor)
@@ -118,6 +121,5 @@ namespace LkdinServer.Logic
 
             return filteredMessages;
         }
-
     }
 }

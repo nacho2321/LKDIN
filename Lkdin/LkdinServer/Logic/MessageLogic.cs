@@ -24,6 +24,5 @@ namespace LkdinServer.Logic
             };
             this.userLogic.AddMessage(newMessage, receptor);
         }
-
     }
 }

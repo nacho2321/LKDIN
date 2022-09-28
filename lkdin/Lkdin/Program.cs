@@ -61,10 +61,9 @@ namespace Lkdin
             Console.WriteLine(" ");
             Console.WriteLine("                           |1|   CREAR USUARIO");
             Console.WriteLine("                           |2|   CREAR PERFIL DE TRABAJO DE USUARIO");
-            Console.WriteLine("                           |3|   AÑADIR FOTO A PERFIL DE TRABAJO");
-            Console.WriteLine("                           |4|   MOSTRAR PERFIL DE TRABAJO ESPECÍFICO");
-            Console.WriteLine("                           |5|   MOSTRAR PERFILES DE TRABAJO EXISTENTES");
-            Console.WriteLine("                           |6|   MENSAJES");
+            Console.WriteLine("                           |3|   MOSTRAR PERFIL DE TRABAJO ESPECÍFICO");
+            Console.WriteLine("                           |4|   MOSTRAR PERFILES DE TRABAJO EXISTENTES");
+            Console.WriteLine("                           |5|   MENSAJES");
             Console.WriteLine("                           |0|   SALIR");
 
             switch (Console.ReadLine())
@@ -76,14 +75,12 @@ namespace Lkdin
                     JobProfileMenu();
                     return true;
                 case "3":
-                    return true;
-                case "4":
                     ConsultSpecificProfile();
                     return true;
-                case "5":
+                case "4":
                     ShowJobProfiles();
                     return true;
-                case "6":
+                case "5":
                     MessageMenu();
                     return true;
                 case "0":
@@ -91,7 +88,7 @@ namespace Lkdin
                     socketClient.Close();
                     return false;
                 default:
-                    Console.WriteLine("Verifique el número ingresado...");
+                    Console.WriteLine("Verifique el dato ingresado...");
                     return true;
             }
         }

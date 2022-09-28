@@ -12,19 +12,23 @@ namespace LkdinServer.Logic
 
         public JobProfile CreateJobProfile(string name, string description, string imagePath, List<string> abilities)
         {
-            JobProfile newJobProfile = null;
+            lock(jobProfiles)
+            { 
+                JobProfile newJobProfile = null;
 
-            if (!Exists(name)) { 
-                newJobProfile = new JobProfile()
-                {
-                    Name = name,
-                    Abilities = abilities,
-                    Description = description,
-                    ImagePath = imagePath
-                };
-                jobProfiles.Add(newJobProfile);
+                if (!Exists(name)) { 
+                    newJobProfile = new JobProfile()
+                    {
+                        Name = name,
+                        Abilities = abilities,
+                        Description = description,
+                        ImagePath = imagePath
+                    };
+                    jobProfiles.Add(newJobProfile);
+                }
+            
+                return newJobProfile;
             }
-            return newJobProfile;
         }
 
         private bool Exists(string profileName)
@@ -47,6 +51,5 @@ namespace LkdinServer.Logic
 
             return data;
         }
-
     }
 }

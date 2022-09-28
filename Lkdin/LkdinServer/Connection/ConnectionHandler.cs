@@ -13,7 +13,6 @@ namespace LkdinServer.Connection
 {
     class ConnectionHandler
     {
-
         private int connections = 0;
         private int maxClients;
 
@@ -54,6 +53,7 @@ namespace LkdinServer.Connection
                 new Thread(() => this.ClientHandler(socketClient)).Start();
                 connections++;
             }
+
             Console.WriteLine("Limite de conexiones alcanzado");
         }
 
@@ -78,7 +78,6 @@ namespace LkdinServer.Connection
                 connections--;
                 Console.WriteLine("Cliente desconectado");
             }
-
         }
 
         public void RoutingOrder(Command order, string data, Socket socket)

@@ -36,7 +36,6 @@ namespace LkdinConnection
                 int length = Int32.Parse(headerToString.Substring(protocolCmdLength));
                 byte[] data = BytesReciever(length, socket);
 
-                
                 ret[0] = order;
                 ret[1] = Encoding.UTF8.GetString(data);
             }
@@ -53,6 +52,7 @@ namespace LkdinConnection
         {
             string fileName = Encoding.UTF8.GetString(BytesReciever(fileNameSize, socket));
             long fileSize = BitConverter.ToInt64(BytesReciever(fixedFileSize, socket));
+
             FileStreamReciever(fileSize, fileName, socket);
         }
 
@@ -60,15 +60,18 @@ namespace LkdinConnection
         {
             byte[] response = new byte[length];
             int offset = 0;
+           
             while (offset < length) 
             {
                 int received = socket.Receive(response, offset, length - offset, SocketFlags.None);
+                
                 if (received == 0)
                 {
                     throw new SocketException();
                 }
                 offset += received;
             }
+
             return response;
         }
 
@@ -81,6 +84,7 @@ namespace LkdinConnection
             while (fileSize > offset)
             {
                 byte[] data;
+
                 if (currentPart == fileParts)
                 {
                     var lastPartSize = (int)(fileSize - offset);
@@ -92,6 +96,7 @@ namespace LkdinConnection
                     data = BytesReciever(Protocol.MaxPacketSize, socket);
                     offset += Protocol.MaxPacketSize;
                 }
+
                 fileStreamHandler.Write(fileName, data);
                 currentPart++;
             }
