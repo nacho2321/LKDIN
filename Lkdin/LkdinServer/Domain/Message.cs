@@ -4,7 +4,6 @@ namespace LKDIN_Server.Domain
 {
     public class Message
     {
-
         private User sender;
         private User receptor;
         private bool read;
@@ -50,6 +49,5 @@ namespace LKDIN_Server.Domain
         {
             this.read = true;
         }
-
     }
 }
