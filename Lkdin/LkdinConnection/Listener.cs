@@ -31,7 +31,7 @@ namespace LkdinConnection
 
             string headerToString = Encoding.UTF8.GetString(header);
             string order = headerToString.Substring(0, protocolCmdLength);
-            if ((Command)Int32.Parse(order) != Command.SendMessage)
+            if ((Command)Int32.Parse(order) != Command.SendFile)
             {
                 int length = Int32.Parse(headerToString.Substring(protocolCmdLength));
                 byte[] data = BytesReciever(length, socket);
