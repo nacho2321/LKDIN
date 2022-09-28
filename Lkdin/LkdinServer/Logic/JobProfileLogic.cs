@@ -47,6 +47,5 @@ namespace LkdinServer.Logic
 
             return data;
         }
-
     }
 }

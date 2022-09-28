@@ -70,6 +70,5 @@ namespace LKDIN_Server.Domain
                 this.imagePath = value ?? throw new ArgumentNullException("La ruta de la imagen no puede ser null");
             }
         }
-
     }
 }

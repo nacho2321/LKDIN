@@ -27,7 +27,6 @@ namespace LkdinServer.Logic
                 };
 
                 users.Add(newUser);
-
             }
             return newUser;
         }
@@ -118,6 +117,5 @@ namespace LkdinServer.Logic
 
             return filteredMessages;
         }
-
     }
 }
