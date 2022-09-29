@@ -351,28 +351,23 @@ namespace Lkdin
                 specialCharactersUsed++;
             }
 
+            specialCharactersUsed = 0;
+
             if (!ContainsSpecialCharacters(jobProfileData, specialCharactersUsed))
             {
-                specialCharactersUsed = 0;
-                sender.SendFile(path, socketClient);
-                string fileName = new FileInfo(path).Name;
-                string newPath = Environment.CurrentDirectory.Replace("Lkdin\\Lkdin", "Lkdin\\LkdinServer") + "\\" + fileName;
-
-                if (File.Exists(newPath))
+                if (OnlyRoute())
                 {
-                    sender.Send(Command.CreateJobProfile, jobProfileData.Replace(path, newPath), socketClient);
+                    sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
                     Console.WriteLine(listener.ReceiveData(socketClient)[1]);
                 }
-                else 
+                else
                 {
-                    Console.WriteLine("EL ARCHIVO INGRESADO NO PUDO SER CARGADO, PRUEBE CON OTRO"); 
-                    Console.WriteLine(" ");
-
-                    goto repeat;
+                    sender.SendFile(path, socketClient);
+                    sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
+                    Console.WriteLine(listener.ReceiveData(socketClient)[1]);
                 }
             }
             else {
-                specialCharactersUsed = 0;
                 goto repeat;
             }
 
@@ -419,6 +414,23 @@ namespace Lkdin
             string data = listener.ReceiveData(socketClient)[1];
             
             return data != "";
+        }
+
+        private static bool OnlyRoute()
+        {
+            Console.WriteLine("Desea solamente asociar una ruta o un archivo:");
+            Console.WriteLine("PRESIONE: ");
+            Console.WriteLine("\n                         |Cualquier tecla|    ASOCIAR RUTA");
+            Console.WriteLine("\n                         |0|   ASOCIAR ARCHIVO");
+            string option = Console.ReadLine();
+            bool value = true;
+
+            if (option == "0")
+            {
+                value = false;
+            }
+
+            return value;
         }
     }
 }
