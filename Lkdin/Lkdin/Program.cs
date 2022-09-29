@@ -351,8 +351,6 @@ namespace Lkdin
                 specialCharactersUsed++;
             }
 
-            specialCharactersUsed = 0;
-
             if (!ContainsSpecialCharacters(jobProfileData, specialCharactersUsed))
             {
                 if (OnlyRoute())
@@ -370,6 +368,8 @@ namespace Lkdin
             else {
                 goto repeat;
             }
+
+            specialCharactersUsed = 0;
 
             return name;
         }
