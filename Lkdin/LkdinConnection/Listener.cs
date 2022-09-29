@@ -23,18 +23,18 @@ namespace LkdinConnection
             this.fileStreamHandler = new FileStreamHandler();
         }
         
-        public string[] RecieveData(Socket socket)
+        public string[] ReceiveData(Socket socket)
         {
             string[] ret = new string[2];
             int headerLength = protocolCmdLength + protocolDataLength;
-            byte[] header = BytesReciever(headerLength, socket);
+            byte[] header = BytesReceiver(headerLength, socket);
 
             string headerToString = Encoding.UTF8.GetString(header);
             string order = headerToString.Substring(0, protocolCmdLength);
             if ((Command)Int32.Parse(order) != Command.SendFile)
             {
                 int length = Int32.Parse(headerToString.Substring(protocolCmdLength));
-                byte[] data = BytesReciever(length, socket);
+                byte[] data = BytesReceiver(length, socket);
 
                 ret[0] = order;
                 ret[1] = Encoding.UTF8.GetString(data);
@@ -42,21 +42,21 @@ namespace LkdinConnection
             else
             {
                 int fileNameSize = Int32.Parse(headerToString.Substring(protocolCmdLength));
-                RecieveFile(fileNameSize, socket);
+                ReceiveFile(fileNameSize, socket);
             }
             
             return ret;
         }
 
-        public void RecieveFile(int fileNameSize, Socket socket)
+        public void ReceiveFile(int fileNameSize, Socket socket)
         {
-            string fileName = Encoding.UTF8.GetString(BytesReciever(fileNameSize, socket));
-            long fileSize = BitConverter.ToInt64(BytesReciever(fixedFileSize, socket));
+            string fileName = Encoding.UTF8.GetString(BytesReceiver(fileNameSize, socket));
+            long fileSize = BitConverter.ToInt64(BytesReceiver(fixedFileSize, socket));
 
-            FileStreamReciever(fileSize, fileName, socket);
+            FileStreamReceiver(fileSize, fileName, socket);
         }
 
-        private byte[] BytesReciever(int length, Socket socket)
+        private byte[] BytesReceiver(int length, Socket socket)
         {
             byte[] response = new byte[length];
             int offset = 0;
@@ -75,7 +75,7 @@ namespace LkdinConnection
             return response;
         }
 
-        private void FileStreamReciever(long fileSize, string fileName, Socket socket)
+        private void FileStreamReceiver(long fileSize, string fileName, Socket socket)
         {
             long fileParts = Protocol.FileParts(fileSize);
             long offset = 0;
@@ -88,12 +88,12 @@ namespace LkdinConnection
                 if (currentPart == fileParts)
                 {
                     var lastPartSize = (int)(fileSize - offset);
-                    data = BytesReciever(lastPartSize, socket);
+                    data = BytesReceiver(lastPartSize, socket);
                     offset += lastPartSize;
                 }
                 else
                 {
-                    data = BytesReciever(Protocol.MaxPacketSize, socket);
+                    data = BytesReceiver(Protocol.MaxPacketSize, socket);
                     offset += Protocol.MaxPacketSize;
                 }
 

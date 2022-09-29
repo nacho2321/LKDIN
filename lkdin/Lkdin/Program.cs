@@ -144,7 +144,7 @@ namespace Lkdin
             if (!ContainsSpecialCharacters(userData, specialCharactersUsed))
             {
                 sender.Send(Command.CreateUser, userData, socketClient);
-                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
             }
             specialCharactersUsed = 0;
         }
@@ -160,7 +160,7 @@ namespace Lkdin
                 jobProfileData += AssignJobProfilesMenu("Elija el perfil de trabajo: ");
 
                 sender.Send(Command.AssignJobProfile, jobProfileData, socketClient);
-                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
             }
             else
             {
@@ -211,7 +211,7 @@ namespace Lkdin
                 if (!ContainsSpecialCharacters(message, 0))
                 {
                     sender.Send(Command.SendMessage, users + message, socketClient);
-                    Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                    Console.WriteLine(listener.ReceiveData(socketClient)[1]);
                 }
                 specialCharactersUsed = 0;
             }
@@ -246,8 +246,8 @@ namespace Lkdin
                     sender.Send(Command.ReadMessages, user + "-" + "newMessages", socketClient);
                 }
 
-                Console.WriteLine(listener.RecieveData(socketClient)[1]);
-                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
             }
             else
             {
@@ -258,7 +258,7 @@ namespace Lkdin
         private static string UsersMenu(string action)
         {
             sender.Send(Command.GetUsersName, socketClient);
-            string data = listener.RecieveData(socketClient)[1];
+            string data = listener.ReceiveData(socketClient)[1];
             List<string> users = data.Split(';').ToList();
             repeat:
 
@@ -282,7 +282,7 @@ namespace Lkdin
         private static string AssignJobProfilesMenu(string action)
         {
             sender.Send(Command.GetJobProfiles, socketClient);
-            string dataJobProfiles = listener.RecieveData(socketClient)[1];
+            string dataJobProfiles = listener.ReceiveData(socketClient)[1];
             List<string> jobProfiles = dataJobProfiles.Split(';').ToList();
 
             repeat:
@@ -361,11 +361,13 @@ namespace Lkdin
                 if (File.Exists(newPath))
                 {
                     sender.Send(Command.CreateJobProfile, jobProfileData.Replace(path, newPath), socketClient);
-                    Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                    Console.WriteLine(listener.ReceiveData(socketClient)[1]);
                 }
                 else 
                 {
-                    Console.WriteLine("EL ARCHIVO INGRESADO NO PUDO SER CARGADO, PRUEBE CON OTRO");
+                    Console.WriteLine("EL ARCHIVO INGRESADO NO PUDO SER CARGADO, PRUEBE CON OTRO"); 
+                    Console.WriteLine(" ");
+
                     goto repeat;
                 }
             }
@@ -383,7 +385,7 @@ namespace Lkdin
             {
                 string user = UsersMenu("Elija el usuario que desea ver el perfil de trabajo:");
                 sender.Send(Command.GetSpecificProfile, user, socketClient);
-                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
             }
             else
             {
@@ -394,7 +396,7 @@ namespace Lkdin
         private static void ShowJobProfiles()
         {
             sender.Send(Command.GetJobProfiles, socketClient);
-            Console.WriteLine(listener.RecieveData(socketClient)[1]);
+            Console.WriteLine(listener.ReceiveData(socketClient)[1]);
         }
 
         private static bool ContainsSpecialCharacters(string data, int charactersUsedBySystem)
@@ -414,7 +416,7 @@ namespace Lkdin
         private static bool UsersLoaded()
         {
             sender.Send(Command.GetUsersName, socketClient);
-            string data = listener.RecieveData(socketClient)[1];
+            string data = listener.ReceiveData(socketClient)[1];
             
             return data != "";
         }
