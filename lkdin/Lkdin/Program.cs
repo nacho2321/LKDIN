@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -150,14 +151,21 @@ namespace Lkdin
 
         private static void JobProfileMenu()
         {
-            string jobProfileData = "";
-            Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
-            Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
-            jobProfileData += UsersMenu("Elija el usuario al que le desea asignar un perfil de trabajo:") + "-";
-            jobProfileData += AssignJobProfilesMenu("Elija el perfil de trabajo: ");
+            if (UsersLoaded())
+            {
+                string jobProfileData = "";
+                Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
+                Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
+                jobProfileData += UsersMenu("Elija el usuario al que le desea asignar un perfil de trabajo:") + "-";
+                jobProfileData += AssignJobProfilesMenu("Elija el perfil de trabajo: ");
 
-            sender.Send(Command.AssignJobProfile, jobProfileData, socketClient);
-            Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                sender.Send(Command.AssignJobProfile, jobProfileData, socketClient);
+                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+            }
+            else
+            {
+                Console.WriteLine("Para realizar esta acción primero debe de tener un usuario creado");
+            }
         }
 
         private static void MessageMenu()
@@ -190,47 +198,61 @@ namespace Lkdin
 
         private static void SendMessage()
         {
-            string users = "";
-            string message = "";
-            Console.WriteLine("ENVIAR MENSAJES");
-            users += UsersMenu("Elija el usuario que va a mandar un mensaje:") + "-";
-            users += UsersMenu("Elija el usuario que va a recibir el mensaje:") + "-";
-            Console.WriteLine("Escriba su mensaje: ");
-            message = Console.ReadLine();
+			if (UsersLoaded())
+			{
+                string users = "";
+                string message = "";
+                Console.WriteLine("ENVIAR MENSAJES");
+                users += UsersMenu("Elija el usuario que va a mandar un mensaje:") + "-";
+                users += UsersMenu("Elija el usuario que va a recibir el mensaje:") + "-";
+                Console.WriteLine("Escriba su mensaje: ");
+                message = Console.ReadLine();
 
-            if (!ContainsSpecialCharacters(message, 0))
-            {
-                sender.Send(Command.SendMessage, users + message, socketClient);
-                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                if (!ContainsSpecialCharacters(message, 0))
+                {
+                    sender.Send(Command.SendMessage, users + message, socketClient);
+                    Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                }
+                specialCharactersUsed = 0;
             }
-            specialCharactersUsed = 0;
+            else
+            {
+                Console.WriteLine("Para realizar esta acción primero debe de tener un usuario creado");
+            }
         }
 
         private static void Inbox()
         {
-            Console.WriteLine("BANDEJA DE ENTRADA");
-            string user = UsersMenu("Elija el usuario que desea ver su bandeja de entrada:");
-            repeat:
-            Console.WriteLine("|1|   Ver mensajes nuevos" +
-            "\n|2|   Ver mensajes leídos");
+            if (UsersLoaded())
+            {
+                Console.WriteLine("BANDEJA DE ENTRADA");
+                string user = UsersMenu("Elija el usuario que desea ver su bandeja de entrada:");
+                repeat:
+                Console.WriteLine("|1|   Ver mensajes nuevos" +
+                "\n|2|   Ver mensajes leídos");
 
-            string option = Console.ReadLine();
-            if (option == "2")
-            {
-                sender.Send(Command.ReadMessages, user + "-" + "readMessages", socketClient);
-            }
-            else if (option != "1" && option != "2")
-            {
-                Console.WriteLine("\n Debe ingresar solamenente 1 o 2");
-                goto repeat;
+                string option = Console.ReadLine();
+                if (option == "2")
+                {
+                    sender.Send(Command.ReadMessages, user + "-" + "readMessages", socketClient);
+                }
+                else if (option != "1" && option != "2")
+                {
+                    Console.WriteLine("\n Debe ingresar solamenente 1 o 2");
+                    goto repeat;
+                }
+                else
+                {
+                    sender.Send(Command.ReadMessages, user + "-" + "newMessages", socketClient);
+                }
+
+                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                Console.WriteLine(listener.RecieveData(socketClient)[1]);
             }
             else
             {
-                sender.Send(Command.ReadMessages, user + "-" + "newMessages", socketClient);
+                Console.WriteLine("Para realizar esta acción primero debe de tener un usuario creado");
             }
-
-            Console.WriteLine(listener.RecieveData(socketClient)[1]);
-            Console.WriteLine(listener.RecieveData(socketClient)[1]);
         }
 
         private static string UsersMenu(string action)
@@ -238,8 +260,8 @@ namespace Lkdin
             sender.Send(Command.GetUsersName, socketClient);
             string data = listener.RecieveData(socketClient)[1];
             List<string> users = data.Split(';').ToList();
-
             repeat:
+
             Console.WriteLine(action);
             for (int i = 0; i < users.Count; i++)
             {
@@ -333,8 +355,19 @@ namespace Lkdin
             {
                 specialCharactersUsed = 0;
                 sender.SendFile(path, socketClient);
-                sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
-                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                string fileName = new FileInfo(path).Name;
+                string newPath = Environment.CurrentDirectory.Replace("Lkdin\\Lkdin", "Lkdin\\LkdinServer") + "\\" + fileName;
+
+                if (File.Exists(newPath))
+                {
+                    sender.Send(Command.CreateJobProfile, jobProfileData.Replace(path, newPath), socketClient);
+                    Console.WriteLine(listener.RecieveData(socketClient)[1]);
+                }
+                else 
+                {
+                    Console.WriteLine("EL ARCHIVO INGRESADO NO PUDO SER CARGADO, PRUEBE CON OTRO");
+                    goto repeat;
+                }
             }
             else {
                 specialCharactersUsed = 0;
@@ -346,9 +379,16 @@ namespace Lkdin
 
         private static void ConsultSpecificProfile()
         {
-            string user = UsersMenu("Elija el usuario que desea ver el perfil de trabajo:");
-            sender.Send(Command.GetSpecificProfile, user, socketClient);
-            Console.WriteLine(listener.RecieveData(socketClient)[1]);
+            if (UsersLoaded())
+            {
+                string user = UsersMenu("Elija el usuario que desea ver el perfil de trabajo:");
+                sender.Send(Command.GetSpecificProfile, user, socketClient);
+                Console.WriteLine(listener.RecieveData(socketClient)[1]);
+            }
+            else
+            {
+                Console.WriteLine("Para realizar esta acción primero debe de tener un usuario creado");
+            }
         }
 
         private static void ShowJobProfiles()
@@ -369,6 +409,14 @@ namespace Lkdin
             }
 
             return contains;
+        }
+
+        private static bool UsersLoaded()
+        {
+            sender.Send(Command.GetUsersName, socketClient);
+            string data = listener.RecieveData(socketClient)[1];
+            
+            return data != "";
         }
     }
 }

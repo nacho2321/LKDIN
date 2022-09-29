@@ -9,6 +9,7 @@ namespace LkdinConnection
     {
         private readonly int protocolDataLength;
         private readonly int maxPacketSize;
+        private readonly int fixedFileSize;
 
         private readonly FileLogic fileLogic;
         private readonly FileStreamHandler fileStreamHandler;
@@ -17,6 +18,7 @@ namespace LkdinConnection
         {
             this.protocolDataLength = Protocol.protocolDataLength;
             this.maxPacketSize = Protocol.MaxPacketSize;
+            this.fixedFileSize = Protocol.FixedFileSize;
 
             this.fileLogic = new FileLogic();
             this.fileStreamHandler = new FileStreamHandler();
@@ -47,7 +49,16 @@ namespace LkdinConnection
                 byte[] convertedfileName = Encoding.UTF8.GetBytes(fileName);
 
                 long fileSize = this.fileLogic.GetFileSize(path);
-                byte[] convertedfileSize = Encoding.UTF8.GetBytes(fileSize.ToString());
+                int zerosToAdd = fixedFileSize - fileSize.ToString().Length; 
+                string fileSizeConverted = null; 
+
+                for (int i = 0; i < zerosToAdd; i++)
+                {
+                    fileSizeConverted += "0"; 
+                }
+                fileSizeConverted += fileSize.ToString();
+
+                byte[] convertedfileSize = Encoding.UTF8.GetBytes(fileSizeConverted);
 
                 BytesSender(headerData, socket);          // Envia header con orden y largo del nombre del archivo
                 BytesSender(convertedfileName, socket);   // Envia nombre del archivo
