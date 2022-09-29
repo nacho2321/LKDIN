@@ -353,6 +353,8 @@ namespace Lkdin
 
             if (!ContainsSpecialCharacters(jobProfileData, specialCharactersUsed))
             {
+                specialCharactersUsed = 0;
+
                 if (OnlyRoute())
                 {
                     sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
@@ -365,11 +367,12 @@ namespace Lkdin
                     Console.WriteLine(listener.ReceiveData(socketClient)[1]);
                 }
             }
-            else {
+            else 
+            {
+                specialCharactersUsed = 0;
                 goto repeat;
             }
 
-            specialCharactersUsed = 0;
 
             return name;
         }
