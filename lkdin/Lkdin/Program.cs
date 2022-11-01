@@ -265,7 +265,7 @@ namespace Lkdin
             Console.WriteLine(action);
             for (int i = 0; i < users.Count; i++)
             {
-                Console.WriteLine("|"+ i + "| " + users[i]);
+                Console.WriteLine("|"+ i + "|" + users[i]);
             }
 
             string userSelected = Console.ReadLine();
@@ -292,7 +292,7 @@ namespace Lkdin
             {
                 for (int i = 0; i < jobProfiles.Count; i++)
                 {
-                    Console.WriteLine("|" + i + "| " + jobProfiles[i]);
+                    Console.WriteLine("|" + i + "|" + jobProfiles[i]);
                 }
             }
 

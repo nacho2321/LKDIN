@@ -114,13 +114,13 @@ namespace LkdinServer.Connection
 
                     case Command.GetUsersName:
                         List<string> usersName = userLogic.GetUsersName();
-                        string joinedNames = String.Join("; ", usersName.ToArray());
+                        string joinedNames = String.Join(";", usersName.ToArray());
                         sender.Send(Command.GetUsersName, joinedNames, socket);
                         break;
 
                     case Command.GetJobProfiles:
                         List<string> jobProfiles = jobProfileLogic.GetJobProfiles();
-                        string joinedJobProfiles = String.Join("; ", jobProfiles.ToArray());
+                        string joinedJobProfiles = String.Join(";", jobProfiles.ToArray());
                         sender.Send(Command.GetJobProfiles, joinedJobProfiles, socket);
                         break;
 
