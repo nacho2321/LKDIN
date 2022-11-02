@@ -1,5 +1,6 @@
 ﻿using LkdinConnection.Exceptions;
 using LkdinConnection.Logic;
+using System;
 using System.Net.Sockets;
 using System.Text;
 
@@ -49,16 +50,7 @@ namespace LkdinConnection
                 byte[] convertedfileName = Encoding.UTF8.GetBytes(fileName);
 
                 long fileSize = this.fileLogic.GetFileSize(path);
-                int zerosToAdd = fixedFileSize - fileSize.ToString().Length; 
-                string fileSizeConverted = null; 
-
-                for (int i = 0; i < zerosToAdd; i++)
-                {
-                    fileSizeConverted += "0"; 
-                }
-                fileSizeConverted += fileSize.ToString();
-
-                byte[] convertedfileSize = Encoding.UTF8.GetBytes(fileSizeConverted);
+                byte[] convertedfileSize = BitConverter.GetBytes(fileSize);
 
                 BytesSender(headerData, socket);          // Envia header con orden y largo del nombre del archivo
                 BytesSender(convertedfileName, socket);   // Envia nombre del archivo

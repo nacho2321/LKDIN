@@ -65,12 +65,15 @@ namespace LkdinServer.Connection
                 while (runServer)
                 {
                     string[] message = this.listener.ReceiveData(socket); // 0 Comando - 1 Datos
-                    Command order = (Command)Int32.Parse(message[0]);
-                    string receivedData = message[1];
+                    if (message[0] != null)
+                    { 
+                        Command order = (Command)Int32.Parse(message[0]);
+                        string receivedData = message[1];
                     
-                    Console.WriteLine(order + " | " + receivedData);
+                        Console.WriteLine(order + " | " + receivedData);
 
-                    RoutingOrder(order, receivedData, socket);
+                        RoutingOrder(order, receivedData, socket);
+                    }
                 }
             }
             catch (SocketException)
@@ -136,7 +139,6 @@ namespace LkdinServer.Connection
                         break;
 
                     case Command.SendFile:
-                        this.listener.ReceiveData(socket);
                         break;
                 }
             }
