@@ -10,7 +10,6 @@ namespace LkdinConnection
     {
         private readonly int protocolDataLength;
         private readonly int maxPacketSize;
-        private readonly int fixedFileSize;
 
         private readonly FileLogic fileLogic;
         private readonly FileStreamHandler fileStreamHandler;
@@ -19,7 +18,6 @@ namespace LkdinConnection
         {
             this.protocolDataLength = Protocol.protocolDataLength;
             this.maxPacketSize = Protocol.MaxPacketSize;
-            this.fixedFileSize = Protocol.FixedFileSize;
 
             this.fileLogic = new FileLogic();
             this.fileStreamHandler = new FileStreamHandler();

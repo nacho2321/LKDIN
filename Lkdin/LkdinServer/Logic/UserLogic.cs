@@ -67,20 +67,10 @@ namespace LkdinServer.Logic
             userToAssign.Profile = jobProfile;
         }
 
-        public string ShowSpecificProfile(string user)
+        public JobProfile GetProfileByName(string user)
         {
-            JobProfile jobProfile = users.FirstOrDefault( x => x.Name == user).Profile;
-
-            string profile = "NOMBRE: " + jobProfile.Name + "\n DESCRIPCIÓN: " + jobProfile.Description +  "\n FOTO DE PERFIL: " + jobProfile.ImagePath + "\n HABILIDADES: ";
-
-            for (int i = 0; i < jobProfile.Abilities.Count; i++)
-            {
-                profile += "\n" + "|" + i + "|" + jobProfile.Abilities[i];
-            }
-
-            return profile;
+            return users.FirstOrDefault(x => x.Name == user).Profile;
         }
-
 
         public List<string> GetUsersName()
         {

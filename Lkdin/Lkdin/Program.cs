@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using LKDIN_Server.Domain;
 using LkdinConnection;
+using LkdinConnection.Logic;
 
 namespace Lkdin
 {
@@ -18,7 +19,7 @@ namespace Lkdin
         static readonly SettingsManager settingsMngr = new SettingsManager();
         static Socket socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         static int specialCharactersUsed = 0;
-
+        static FileLogic fileLogic = new FileLogic();
         static void Main(string[] args)
         {
             Console.WriteLine("Iniciando Aplicacion Cliente...");
@@ -333,6 +334,7 @@ namespace Lkdin
             specialCharactersUsed++;
             Console.WriteLine("Habilidades:");
             bool addAbilities = true;
+
             while (addAbilities)
             {
                 Console.WriteLine("Agregue una Habilidad:");
@@ -355,24 +357,16 @@ namespace Lkdin
             {
                 specialCharactersUsed = 0;
 
-                if (OnlyRoute())
-                {
-                    sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
-                    Console.WriteLine(listener.ReceiveData(socketClient)[1]);
-                }
-                else
-                {
-                    sender.SendFile(path, socketClient);
-                    sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
-                    Console.WriteLine(listener.ReceiveData(socketClient)[1]);
-                }
+                sender.SendFile(path, socketClient);
+                sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
+                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+
             }
             else 
             {
                 specialCharactersUsed = 0;
                 goto repeat;
             }
-
 
             return name;
         }
@@ -383,7 +377,11 @@ namespace Lkdin
             {
                 string user = UsersMenu("Elija el usuario que desea ver el perfil de trabajo:");
                 sender.Send(Command.GetSpecificProfile, user, socketClient);
-                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+
+                string recievedData = listener.ReceiveData(socketClient)[1];
+                listener.ReceiveData(socketClient);
+
+                Console.WriteLine(RecieveSpecificProfile(recievedData));
             }
             else
             {
@@ -419,21 +417,19 @@ namespace Lkdin
             return data != "";
         }
 
-        private static bool OnlyRoute()
+        private static string RecieveSpecificProfile(string rawProfileData)
         {
-            Console.WriteLine("Desea solamente asociar una ruta o un archivo:");
-            Console.WriteLine("PRESIONE: ");
-            Console.WriteLine("\n                         |Cualquier tecla|    ASOCIAR RUTA");
-            Console.WriteLine("\n                         |0|   ASOCIAR ARCHIVO");
-            string option = Console.ReadLine();
-            bool value = true;
+            string[] splittedData = rawProfileData.Split('-');
+            string filePath = fileLogic.GetPath(splittedData[2]);
 
-            if (option == "0")
-            {
-                value = false;
-            }
+            string profile = "NOMBRE: " + splittedData[0] + "\nDESCRIPCIÓN: " + splittedData[1]+ "\nFOTO DE PERFIL: " + filePath + "\nHABILIDADES: ";
 
-            return value;
+            string[] abilities = splittedData[3].Split(';');
+
+            for (int i = 0; i < abilities.Length; i++)
+                profile += "\n" + "|" + i + "|" + abilities[i];
+            
+            return profile;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using LkdinConnection;
+using LkdinConnection.Logic;
 using LkdinServer.Connection;
 using LkdinServer.Logic;
 using System;
@@ -15,7 +16,10 @@ namespace LkdinServer
             UserLogic userLogic = new UserLogic();
             JobProfileLogic jobProfileLogic = new JobProfileLogic();
             MessageLogic messageLogic = new MessageLogic(userLogic);
-            ConnectionHandler serverConnection = new ConnectionHandler(userLogic, jobProfileLogic, messageLogic, sender, listener);
+            FileLogic fileLogic = new FileLogic();
+
+            ConnectionHandler serverConnection = new ConnectionHandler(userLogic, jobProfileLogic, messageLogic, sender, listener, fileLogic);
+            
             Console.WriteLine("Iniciando Aplicacion Servidor...");
             serverConnection.Listen();
         }

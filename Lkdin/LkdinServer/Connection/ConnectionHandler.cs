@@ -1,6 +1,7 @@
 ﻿using LKDIN_Server.Domain;
 using LKDIN_Server.Exceptions;
 using LkdinConnection;
+using LkdinConnection.Logic;
 using LkdinServer.Logic;
 using System;
 using System.Collections.Generic;
@@ -22,17 +23,22 @@ namespace LkdinServer.Connection
         private UserLogic userLogic;
         private JobProfileLogic jobProfileLogic;
         private MessageLogic messageLogic;
-        
+
+        private FileLogic fileLogic;
+
         static readonly SettingsManager settingsMngr = new SettingsManager();
 
-        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender, Listener listener)
+        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender, Listener listener, FileLogic fileLogic)
         {
             this.maxClients = Int32.Parse(settingsMngr.ReadSettings(ServerConfig.serverMaxClientsconfigkey));
             this.userLogic = userLogic;
             this.jobProfileLogic = jobProfileLogic;
             this.messageLogic = messageLogic;
+
+            this.fileLogic = fileLogic;
             this.sender = sender;
             this.listener = listener;
+
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             string ipServer = settingsMngr.ReadSettings(ServerConfig.serverIPconfigkey);
             int ipPort = int.Parse(settingsMngr.ReadSettings(ServerConfig.serverPortconfigkey));
@@ -66,10 +72,10 @@ namespace LkdinServer.Connection
                 {
                     string[] message = this.listener.ReceiveData(socket); // 0 Comando - 1 Datos
                     if (message[0] != null)
-                    { 
+                    {
                         Command order = (Command)Int32.Parse(message[0]);
                         string receivedData = message[1];
-                    
+
                         Console.WriteLine(order + " | " + receivedData);
 
                         RoutingOrder(order, receivedData, socket);
@@ -128,14 +134,20 @@ namespace LkdinServer.Connection
                         break;
 
                     case Command.GetSpecificProfile:
-                        string specificProfile = userLogic.ShowSpecificProfile(splittedData[0]);
-                        sender.Send(Command.GetSpecificProfile, specificProfile, socket);
+                        JobProfile profile = userLogic.GetProfileByName(splittedData[0]);
+
+                        // envio info del perfil
+                        sender.Send(Command.GetSpecificProfile, GetJobProfileMessage(profile), socket);
+
+                        // envio imagen del perfil
+                        sender.SendFile(profile.ImagePath, socket);
+
                         break;
 
-                    case Command.AssignJobProfile: 
-                        JobProfile jobProfile = jobProfileLogic.GetJobProfile(splittedData[1]); 
-                        userLogic.AssignJobProfile(splittedData[0], jobProfile); 
-                        CreationResponseHandler(Command.AssignJobProfile, jobProfile, "PERFIL DE TRABAJO ASIGNADO CORRECTAMENTE", "ERROR AL ASIGNAR, INTENTE NUEVAMENTE", socket); 
+                    case Command.AssignJobProfile:
+                        JobProfile jobProfile = jobProfileLogic.GetJobProfile(splittedData[1]);
+                        userLogic.AssignJobProfile(splittedData[0], jobProfile);
+                        CreationResponseHandler(Command.AssignJobProfile, jobProfile, "PERFIL DE TRABAJO ASIGNADO CORRECTAMENTE", "ERROR AL ASIGNAR, INTENTE NUEVAMENTE", socket);
                         break;
 
                     case Command.SendFile:
@@ -158,6 +170,12 @@ namespace LkdinServer.Connection
             string messageToReturn = (objCreated) ? OkResponse : errorResponse;
 
             sender.Send(cmdToRespond, messageToReturn, socket);
+        }
+
+
+        private string GetJobProfileMessage(JobProfile profile) 
+        {
+            return profile.Name + '-' + profile.Description + '-' + fileLogic.GetName(profile.ImagePath) + '-' + String.Join(";", profile.Abilities.ToArray());
         }
     }
 }

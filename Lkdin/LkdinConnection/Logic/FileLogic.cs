@@ -17,6 +17,11 @@ namespace LkdinConnection.Logic
             return (Exists(path)) ? new FileInfo(path).Name : "";
         }
 
+        public string GetPath(string fileName)
+        {
+            return Path.GetFullPath(fileName);
+        }
+
         public long GetFileSize(string path)
         {
             return (Exists(path)) ? new FileInfo(path).Length : 0;
