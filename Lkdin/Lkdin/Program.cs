@@ -42,7 +42,7 @@ namespace Lkdin
                 await using (var netStream = tcpClient.GetStream())
                 {
                     Console.WriteLine("Conectado con el servidor");
-              
+
                     while (showMenu)
                     {
                         showMenu = (await MainMenu(netStream));
@@ -55,7 +55,7 @@ namespace Lkdin
             {
 
                 Console.WriteLine("No se ha podido conectar con el servidor, reinicie la aplicación e intente nuevamente");
-            } 
+            }
         }
 
         private static async Task<bool> MainMenu(NetworkStream netStream)
@@ -206,8 +206,8 @@ namespace Lkdin
 
         private static async Task SendMessage(NetworkStream netStream)
         {
-			if (await UsersLoaded(netStream))
-			{
+            if (await UsersLoaded(netStream))
+            {
                 string users = "";
                 string message = "";
                 Console.WriteLine("ENVIAR MENSAJES");
@@ -273,7 +273,7 @@ namespace Lkdin
             Console.WriteLine(action);
             for (int i = 0; i < users.Count; i++)
             {
-                Console.WriteLine("|"+ i + "|" + users[i]);
+                Console.WriteLine("|" + i + "|" + users[i]);
             }
 
             string userSelected = Console.ReadLine();
@@ -305,16 +305,16 @@ namespace Lkdin
             }
 
             Console.WriteLine("-------------------------------------------------------------");
-            Console.WriteLine("|" + jobProfiles.Count +"| AGREGAR NUEVO PERFIL DE TRABAJO");
+            Console.WriteLine("|" + jobProfiles.Count + "| AGREGAR NUEVO PERFIL DE TRABAJO");
 
             string data = Console.ReadLine();
 
-            if (!Regex.IsMatch(data, @"^[0-9]+$") || Int32.Parse(data) > jobProfiles.Count|| Int32.Parse(data) < 0 || (Int32.Parse(data) == 0 && jobProfiles[0] == ""))
+            if (!Regex.IsMatch(data, @"^[0-9]+$") || Int32.Parse(data) > jobProfiles.Count || Int32.Parse(data) < 0 || (Int32.Parse(data) == 0 && jobProfiles[0] == ""))
             {
                 Console.WriteLine("Verifique los datos ingresados");
                 goto repeat;
             }
-            else if (Int32.Parse(data) == (jobProfiles.Count ))
+            else if (Int32.Parse(data) == (jobProfiles.Count))
             {
                 return await CreateJobProfile(netStream);
             }
@@ -374,7 +374,7 @@ namespace Lkdin
                 Console.WriteLine((await listener.ReceiveData(netStream))[1]);
 
             }
-            else 
+            else
             {
                 specialCharactersUsed = 0;
                 goto repeat;
@@ -425,7 +425,7 @@ namespace Lkdin
         {
             await sender.Send(Command.GetUsersName, tcpClient);
             string data = (await listener.ReceiveData(netStream))[1];
-            
+
             return data != "";
         }
 
@@ -434,13 +434,13 @@ namespace Lkdin
             string[] splittedData = rawProfileData.Split('-');
             string filePath = fileLogic.GetPath(splittedData[2]);
 
-            string profile = "NOMBRE: " + splittedData[0] + "\nDESCRIPCIÓN: " + splittedData[1]+ "\nFOTO DE PERFIL: " + filePath + "\nHABILIDADES: ";
+            string profile = "NOMBRE: " + splittedData[0] + "\nDESCRIPCIÓN: " + splittedData[1] + "\nFOTO DE PERFIL: " + filePath + "\nHABILIDADES: ";
 
             string[] abilities = splittedData[3].Split(';');
 
             for (int i = 0; i < abilities.Length; i++)
                 profile += "\n" + "|" + i + "|" + abilities[i];
-            
+
             return profile;
         }
     }
