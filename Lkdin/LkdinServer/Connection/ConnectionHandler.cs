@@ -2,6 +2,7 @@
 using LKDIN_Server.Exceptions;
 using LkdinConnection;
 using LkdinConnection.Logic;
+using LkdinConnection.Exceptions;
 using LkdinServer.Logic;
 using System;
 using System.Collections.Generic;
@@ -167,7 +168,7 @@ namespace LkdinServer.Connection
             }
             catch (Exception ex)
             {
-                if (ex is DomainException || ex is ArgumentNullException)
+                if (ex is DomainException || ex is ArgumentNullException || ex is FileException)
                 {
                     await sender.Send(Command.ThrowException, ex.Message, netStream);
                 }

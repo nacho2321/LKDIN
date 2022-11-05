@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using LkdinConnection;
+using LkdinConnection.Exceptions;
 using LkdinConnection.Logic;
 
 namespace Lkdin
@@ -368,11 +369,16 @@ namespace Lkdin
             if (!ContainsSpecialCharacters(jobProfileData, specialCharactersUsed))
             {
                 specialCharactersUsed = 0;
-
-                await sender.SendFile(path, netStream);
-                await sender.Send(Command.CreateJobProfile, jobProfileData, netStream);
-                Console.WriteLine((await listener.ReceiveData(netStream))[1]);
-
+                try
+                {
+                    await sender.SendFile(path, netStream);
+                    await sender.Send(Command.CreateJobProfile, jobProfileData, netStream);
+                    Console.WriteLine((await listener.ReceiveData(netStream))[1]);
+                }
+                catch (FileException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
             else
             {
