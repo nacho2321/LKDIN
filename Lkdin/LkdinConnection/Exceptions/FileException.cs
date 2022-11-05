@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace LkdinConnection.Exceptions
 {
     [Serializable]
-    internal class FileException : Exception
+    public class FileException : Exception
     {
         public FileException()
         {
