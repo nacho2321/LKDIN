@@ -24,23 +24,23 @@ namespace LkdinConnection
             this.fileStreamHandler = new FileStreamHandler();
         }
 
-        public async Task Send(Command order, TcpClient tcpSocket)
+        public async Task Send(Command order, NetworkStream netStream)
         {
-            await Send(order, "", tcpSocket);
+            await Send(order, "", netStream);
         }
 
-        public async Task Send(Command order, string message, TcpClient tcpSocket)
+        public async Task Send(Command order, string message, NetworkStream netStream)
         {
             byte[] data = Encoding.UTF8.GetBytes(message);
             int dataLength = data.Length;
 
             byte[] headerData = this.HeaderEncoder(order, dataLength);
 
-            await BytesSender (headerData, tcpSocket);    // Primero envia header con orden y largo de datos
-            await BytesSender (data, tcpSocket);          // Luego envia los datos (el mensaje)
+            await BytesSender (headerData, netStream);    // Primero envia header con orden y largo de datos
+            await BytesSender (data, netStream);          // Luego envia los datos (el mensaje)
         }
 
-        public async Task SendFile(string path, TcpClient tcpSocket)
+        public async Task SendFile(string path, NetworkStream netStream)
         {
             if (fileLogic.Exists(path))
             {
@@ -51,10 +51,10 @@ namespace LkdinConnection
                 long fileSize = this.fileLogic.GetFileSize(path);
                 byte[] convertedfileSize = BitConverter.GetBytes(fileSize);
 
-                await BytesSender(headerData, tcpSocket);          // Envia header con orden y largo del nombre del archivo
-                await BytesSender(convertedfileName, tcpSocket);   // Envia nombre del archivo
-                await BytesSender(convertedfileSize, tcpSocket);   // Envia tamaño del archivo
-                await FileStreamSenderAsync(fileSize, path, tcpSocket); // Envia archivo
+                await BytesSender(headerData, netStream);          // Envia header con orden y largo del nombre del archivo
+                await BytesSender(convertedfileName, netStream);   // Envia nombre del archivo
+                await BytesSender(convertedfileSize, netStream);   // Envia tamaño del archivo
+                await FileStreamSenderAsync(fileSize, path, netStream); // Envia archivo
             }
             else
             {
@@ -80,17 +80,13 @@ namespace LkdinConnection
             return Encoding.UTF8.GetBytes(header);
         }
 
-        private async Task BytesSender(byte[] data, TcpClient tcpSocket)
+        private async Task BytesSender(byte[] data, NetworkStream netStream)
         {
             int size = data.Length;
-            await using (var networkStream = tcpSocket.GetStream())
-            {
-                await networkStream.WriteAsync(data, 0, size).ConfigureAwait(false);
-
-            }
+            await netStream.WriteAsync(data, 0, size).ConfigureAwait(false);
         }
 
-        private async Task FileStreamSenderAsync(long fileSize, string path, TcpClient tcpSocket)
+        private async Task FileStreamSenderAsync(long fileSize, string path, NetworkStream netStream)
         {
             long fileParts = Protocol.FileParts(fileSize);
             long offset = 0;
@@ -111,7 +107,7 @@ namespace LkdinConnection
                     offset += maxPacketSize;
                 }
 
-                await BytesSender(data, tcpSocket);
+                await BytesSender(data, netStream);
 
                 currentPart++;
             }

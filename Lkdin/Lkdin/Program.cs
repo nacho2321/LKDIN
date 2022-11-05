@@ -38,20 +38,20 @@ namespace Lkdin
 
             try
             {
-                bool showMenu = true;
                 await using (var netStream = tcpClient.GetStream())
                 {
+                    bool showMenu = true;
                     Console.WriteLine("Conectado con el servidor");
               
                     while (showMenu)
                     {
-                        showMenu = (await MainMenu(netStream));
+                        showMenu = await MainMenu(netStream);
                     }
                 }
 
                 tcpClient.Close();
             }
-            catch (SocketException ex)
+            catch (Exception ex)
             {
 
                 Console.WriteLine("No se ha podido conectar con el servidor, reinicie la aplicación e intente nuevamente");
@@ -151,7 +151,7 @@ namespace Lkdin
 
             if (!ContainsSpecialCharacters(userData, specialCharactersUsed))
             {
-                await sender.Send(Command.CreateUser, userData, tcpClient);
+                await sender.Send(Command.CreateUser, userData, netStream);
                 Console.WriteLine((await listener.ReceiveData(netStream))[1]);
             }
             specialCharactersUsed = 0;
@@ -164,10 +164,10 @@ namespace Lkdin
                 string jobProfileData = "";
                 Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
                 Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
-                jobProfileData += UsersMenu("Elija el usuario al que le desea asignar un perfil de trabajo:", netStream) + "-";
-                jobProfileData += AssignJobProfilesMenu("Elija el perfil de trabajo: ", netStream);
+                jobProfileData += await UsersMenu("Elija el usuario al que le desea asignar un perfil de trabajo:", netStream) + "-";
+                jobProfileData += await AssignJobProfilesMenu("Elija el perfil de trabajo: ", netStream);
 
-                await sender.Send(Command.AssignJobProfile, jobProfileData, tcpClient);
+                await sender.Send(Command.AssignJobProfile, jobProfileData, netStream);
                 Console.WriteLine((await listener.ReceiveData(netStream))[1]);
             }
             else
@@ -211,14 +211,14 @@ namespace Lkdin
                 string users = "";
                 string message = "";
                 Console.WriteLine("ENVIAR MENSAJES");
-                users += UsersMenu("Elija el usuario que va a mandar un mensaje:", netStream) + "-";
-                users += UsersMenu("Elija el usuario que va a recibir el mensaje:", netStream) + "-";
+                users += await UsersMenu("Elija el usuario que va a mandar un mensaje:", netStream) + "-";
+                users += await UsersMenu("Elija el usuario que va a recibir el mensaje:", netStream) + "-";
                 Console.WriteLine("Escriba su mensaje: ");
                 message = Console.ReadLine();
 
                 if (!ContainsSpecialCharacters(message, 0))
                 {
-                    await sender.Send(Command.SendMessage, users + message, tcpClient);
+                    await sender.Send(Command.SendMessage, users + message, netStream);
                     Console.WriteLine((await listener.ReceiveData(netStream))[1]);
                 }
                 specialCharactersUsed = 0;
@@ -242,7 +242,7 @@ namespace Lkdin
                 string option = Console.ReadLine();
                 if (option == "2")
                 {
-                    await sender.Send(Command.ReadMessages, user + "-" + "readMessages", tcpClient);
+                    await sender.Send(Command.ReadMessages, user + "-" + "readMessages", netStream);
                 }
                 else if (option != "1" && option != "2")
                 {
@@ -251,7 +251,7 @@ namespace Lkdin
                 }
                 else
                 {
-                    await sender.Send(Command.ReadMessages, user + "-" + "newMessages", tcpClient);
+                    await sender.Send(Command.ReadMessages, user + "-" + "newMessages", netStream);
                 }
 
                 Console.WriteLine((await listener.ReceiveData(netStream))[1]);
@@ -265,7 +265,7 @@ namespace Lkdin
 
         private static async Task<string> UsersMenu(string action, NetworkStream netStream)
         {
-            await sender.Send(Command.GetUsersName, tcpClient);
+            await sender.Send(Command.GetUsersName, netStream);
             string data = (await listener.ReceiveData(netStream))[1];
             List<string> users = data.Split(';').ToList();
             repeat:
@@ -289,7 +289,7 @@ namespace Lkdin
 
         private static async Task<string> AssignJobProfilesMenu(string action, NetworkStream netStream)
         {
-            await sender.Send(Command.GetJobProfiles, tcpClient);
+            await sender.Send(Command.GetJobProfiles, netStream);
             string dataJobProfiles = (await listener.ReceiveData(netStream))[1];
             List<string> jobProfiles = dataJobProfiles.Split(';').ToList();
 
@@ -369,8 +369,8 @@ namespace Lkdin
             {
                 specialCharactersUsed = 0;
 
-                await sender.SendFile(path, tcpClient);
-                await sender.Send(Command.CreateJobProfile, jobProfileData, tcpClient);
+                await sender.SendFile(path, netStream);
+                await sender.Send(Command.CreateJobProfile, jobProfileData, netStream);
                 Console.WriteLine((await listener.ReceiveData(netStream))[1]);
 
             }
@@ -388,7 +388,7 @@ namespace Lkdin
             if (await UsersLoaded(netStream))
             {
                 string user = await UsersMenu("Elija el usuario que desea ver el perfil de trabajo:", netStream);
-                await sender.Send(Command.GetSpecificProfile, user, tcpClient);
+                await sender.Send(Command.GetSpecificProfile, user, netStream);
 
                 string recievedData = (await listener.ReceiveData(netStream))[1];
                 await listener.ReceiveData(netStream);
@@ -403,7 +403,7 @@ namespace Lkdin
 
         private static async Task ShowJobProfiles(NetworkStream netStream)
         {
-            await sender.Send(Command.GetJobProfiles, tcpClient);
+            await sender.Send(Command.GetJobProfiles, netStream);
             Console.WriteLine((await listener.ReceiveData(netStream))[1]);
         }
 
@@ -423,7 +423,7 @@ namespace Lkdin
 
         private static async Task<bool> UsersLoaded(NetworkStream netStream)
         {
-            await sender.Send(Command.GetUsersName, tcpClient);
+            await sender.Send(Command.GetUsersName, netStream);
             string data = (await listener.ReceiveData(netStream))[1];
             
             return data != "";
