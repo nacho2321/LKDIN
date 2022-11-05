@@ -72,7 +72,7 @@ namespace LkdinConnection
                 int received = await networkStream.ReadAsync(response, offset, length - offset).ConfigureAwait(false);
                 if (received == 0)
                 {
-                    throw new Exception(); //TODO tirar exception especifica
+                    throw new SocketException(); //TODO tirar exception especifica
                 }
                 offset += received;
             }
