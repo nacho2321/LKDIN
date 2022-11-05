@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using System.Text.RegularExpressions;
-using LKDIN_Server.Domain;
+using System.Threading.Tasks;
 using LkdinConnection;
+using LkdinConnection.Logic;
 
 namespace Lkdin
 {
@@ -16,31 +15,41 @@ namespace Lkdin
         static Sender sender = new Sender();
         static Listener listener = new Listener();
         static readonly SettingsManager settingsMngr = new SettingsManager();
-        static Socket socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-        static int specialCharactersUsed = 0;
+        static TcpClient tcpClient;
 
-        static void Main(string[] args)
+        static int specialCharactersUsed = 0;
+        static FileLogic fileLogic = new FileLogic();
+
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Iniciando Aplicacion Cliente...");
 
             string ipServer = settingsMngr.ReadSettings(ClientConfig.serverIPconfigkey);
-            string ipClient = settingsMngr.ReadSettings(ClientConfig.clientIPconfigkey);
             int serverPort = int.Parse(settingsMngr.ReadSettings(ClientConfig.serverPortconfigkey));
 
-            var localEndPoint = new IPEndPoint(IPAddress.Parse(ipClient), 0);
-            socketClient.Bind(localEndPoint);
-            var serverEndpoint = new IPEndPoint(IPAddress.Parse(ipServer), serverPort);
+            string ipClient = settingsMngr.ReadSettings(ClientConfig.clientIPconfigkey);
+            int clientPort = int.Parse(settingsMngr.ReadSettings(ClientConfig.clientPortconfigkey));
+
+            var localEndPoint = new IPEndPoint(IPAddress.Parse(ipClient), clientPort);
+
+            tcpClient = new TcpClient(localEndPoint);
+
+            await tcpClient.ConnectAsync(IPAddress.Parse(ipServer), serverPort).ConfigureAwait(false);
 
             try
             {
-                socketClient.Connect(serverEndpoint);
-                Console.WriteLine("Conectado con el servidor");
-
                 bool showMenu = true;
-                while (showMenu)
+                await using (var netStream = tcpClient.GetStream())
                 {
-                    showMenu = MainMenu();
+                    Console.WriteLine("Conectado con el servidor");
+              
+                    while (showMenu)
+                    {
+                        showMenu = (await MainMenu(netStream));
+                    }
                 }
+
+                tcpClient.Close();
             }
             catch (SocketException ex)
             {
@@ -49,7 +58,7 @@ namespace Lkdin
             } 
         }
 
-        private static bool MainMenu()
+        private static async Task<bool> MainMenu(NetworkStream netStream)
         {
             Console.WriteLine("     ██████╗░██╗███████╗███╗░░██╗██╗░░░██╗███████╗███╗░░██╗██╗██████╗░░█████╗░");
             Console.WriteLine("     ██╔══██╗██║██╔════╝████╗░██║██║░░░██║██╔════╝████╗░██║██║██╔══██╗██╔══██╗");
@@ -70,23 +79,22 @@ namespace Lkdin
             switch (Console.ReadLine())
             {
                 case "1":
-                    CreateUser();
+                    await CreateUser(netStream);
                     return true;
                 case "2":
-                    JobProfileMenu();
+                    await JobProfileMenu(netStream);
                     return true;
                 case "3":
-                    ConsultSpecificProfile();
+                    await ConsultSpecificProfile(netStream);
                     return true;
                 case "4":
-                    ShowJobProfiles();
+                    await ShowJobProfiles(netStream);
                     return true;
                 case "5":
-                    MessageMenu();
+                    await MessageMenu(netStream);
                     return true;
                 case "0":
-                    socketClient.Shutdown(SocketShutdown.Both);
-                    socketClient.Close();
+                    tcpClient.Close();
                     return false;
                 default:
                     Console.WriteLine("Verifique el dato ingresado...");
@@ -94,7 +102,7 @@ namespace Lkdin
             }
         }
 
-        private static void CreateUser()
+        private static async Task CreateUser(NetworkStream netStream)
         {
             string userData = "";
             Console.WriteLine("█▀▀ █▀█ █▀▀ ▄▀█ █▀▀ █ █▀█ █▄░█   █▀▄ █▀▀   █░█ █▀ █░█ ▄▀█ █▀█ █ █▀█ █▀");
@@ -143,24 +151,24 @@ namespace Lkdin
 
             if (!ContainsSpecialCharacters(userData, specialCharactersUsed))
             {
-                sender.Send(Command.CreateUser, userData, socketClient);
-                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+                await sender.Send(Command.CreateUser, userData, tcpClient);
+                Console.WriteLine((await listener.ReceiveData(netStream))[1]);
             }
             specialCharactersUsed = 0;
         }
 
-        private static void JobProfileMenu()
+        private static async Task JobProfileMenu(NetworkStream netStream)
         {
-            if (UsersLoaded())
+            if (await UsersLoaded(netStream))
             {
                 string jobProfileData = "";
                 Console.WriteLine("█▀█ █▀▀ █▀█ █▀▀ █ █░░   █▀▄ █▀▀   ▀█▀ █▀█ ▄▀█ █▄▄ ▄▀█ ░░█ █▀█");
                 Console.WriteLine("█▀▀ ██▄ █▀▄ █▀░ █ █▄▄   █▄▀ ██▄   ░█░ █▀▄ █▀█ █▄█ █▀█ █▄█ █▄█");
-                jobProfileData += UsersMenu("Elija el usuario al que le desea asignar un perfil de trabajo:") + "-";
-                jobProfileData += AssignJobProfilesMenu("Elija el perfil de trabajo: ");
+                jobProfileData += UsersMenu("Elija el usuario al que le desea asignar un perfil de trabajo:", netStream) + "-";
+                jobProfileData += AssignJobProfilesMenu("Elija el perfil de trabajo: ", netStream);
 
-                sender.Send(Command.AssignJobProfile, jobProfileData, socketClient);
-                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+                await sender.Send(Command.AssignJobProfile, jobProfileData, tcpClient);
+                Console.WriteLine((await listener.ReceiveData(netStream))[1]);
             }
             else
             {
@@ -168,7 +176,7 @@ namespace Lkdin
             }
         }
 
-        private static void MessageMenu()
+        private static async Task MessageMenu(NetworkStream netStream)
         {
             Console.WriteLine("█▀▄▀█ █▀▀ █▄░█ █▀ ▄▀█ ░░█ █▀▀ █▀");
             Console.WriteLine("█░▀░█ ██▄ █░▀█ ▄█ █▀█ █▄█ ██▄ ▄█");
@@ -181,37 +189,37 @@ namespace Lkdin
             switch (Console.ReadLine())
             {
                 case "1":
-                    SendMessage();
+                    await SendMessage(netStream);
                     break;
                 case "2":
-                    Inbox();
+                    await Inbox(netStream);
                     break;
                 case "0":
-                    MainMenu();
+                    await MainMenu(netStream);
                     break;
                 default:
                     Console.WriteLine("Verifique el número ingresado...");
-                    MessageMenu();
+                    await MessageMenu(netStream);
                     break;
             }
         }
 
-        private static void SendMessage()
+        private static async Task SendMessage(NetworkStream netStream)
         {
-			if (UsersLoaded())
+			if (await UsersLoaded(netStream))
 			{
                 string users = "";
                 string message = "";
                 Console.WriteLine("ENVIAR MENSAJES");
-                users += UsersMenu("Elija el usuario que va a mandar un mensaje:") + "-";
-                users += UsersMenu("Elija el usuario que va a recibir el mensaje:") + "-";
+                users += UsersMenu("Elija el usuario que va a mandar un mensaje:", netStream) + "-";
+                users += UsersMenu("Elija el usuario que va a recibir el mensaje:", netStream) + "-";
                 Console.WriteLine("Escriba su mensaje: ");
                 message = Console.ReadLine();
 
                 if (!ContainsSpecialCharacters(message, 0))
                 {
-                    sender.Send(Command.SendMessage, users + message, socketClient);
-                    Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+                    await sender.Send(Command.SendMessage, users + message, tcpClient);
+                    Console.WriteLine((await listener.ReceiveData(netStream))[1]);
                 }
                 specialCharactersUsed = 0;
             }
@@ -221,12 +229,12 @@ namespace Lkdin
             }
         }
 
-        private static void Inbox()
+        private static async Task Inbox(NetworkStream netStream)
         {
-            if (UsersLoaded())
+            if (await UsersLoaded(netStream))
             {
                 Console.WriteLine("BANDEJA DE ENTRADA");
-                string user = UsersMenu("Elija el usuario que desea ver su bandeja de entrada:");
+                string user = await UsersMenu("Elija el usuario que desea ver su bandeja de entrada:", netStream);
                 repeat:
                 Console.WriteLine("|1|   Ver mensajes nuevos" +
                 "\n|2|   Ver mensajes leídos");
@@ -234,7 +242,7 @@ namespace Lkdin
                 string option = Console.ReadLine();
                 if (option == "2")
                 {
-                    sender.Send(Command.ReadMessages, user + "-" + "readMessages", socketClient);
+                    await sender.Send(Command.ReadMessages, user + "-" + "readMessages", tcpClient);
                 }
                 else if (option != "1" && option != "2")
                 {
@@ -243,11 +251,11 @@ namespace Lkdin
                 }
                 else
                 {
-                    sender.Send(Command.ReadMessages, user + "-" + "newMessages", socketClient);
+                    await sender.Send(Command.ReadMessages, user + "-" + "newMessages", tcpClient);
                 }
 
-                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
-                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+                Console.WriteLine((await listener.ReceiveData(netStream))[1]);
+                Console.WriteLine((await listener.ReceiveData(netStream))[1]);
             }
             else
             {
@@ -255,10 +263,10 @@ namespace Lkdin
             }
         }
 
-        private static string UsersMenu(string action)
+        private static async Task<string> UsersMenu(string action, NetworkStream netStream)
         {
-            sender.Send(Command.GetUsersName, socketClient);
-            string data = listener.ReceiveData(socketClient)[1];
+            await sender.Send(Command.GetUsersName, tcpClient);
+            string data = (await listener.ReceiveData(netStream))[1];
             List<string> users = data.Split(';').ToList();
             repeat:
 
@@ -279,10 +287,10 @@ namespace Lkdin
             return users[Int32.Parse(userSelected)];
         }
 
-        private static string AssignJobProfilesMenu(string action)
+        private static async Task<string> AssignJobProfilesMenu(string action, NetworkStream netStream)
         {
-            sender.Send(Command.GetJobProfiles, socketClient);
-            string dataJobProfiles = listener.ReceiveData(socketClient)[1];
+            await sender.Send(Command.GetJobProfiles, tcpClient);
+            string dataJobProfiles = (await listener.ReceiveData(netStream))[1];
             List<string> jobProfiles = dataJobProfiles.Split(';').ToList();
 
             repeat:
@@ -308,35 +316,41 @@ namespace Lkdin
             }
             else if (Int32.Parse(data) == (jobProfiles.Count ))
             {
-                return CreateJobProfile();
+                return await CreateJobProfile(netStream);
             }
 
             return jobProfiles[Int32.Parse(data)];
         }
 
-        private static string CreateJobProfile()
+        private static async Task<string> CreateJobProfile(NetworkStream netStream)
         {
             repeat:
             Console.WriteLine("CREACIÓN DE PERFILES DE TRABAJO");
             string name = "";
             string jobProfileData = "";
+
             Console.WriteLine("Nombre:");
             jobProfileData += Console.ReadLine() + "-";
             name = jobProfileData;
             specialCharactersUsed++;
+
             Console.WriteLine("Descripción:");
             jobProfileData += Console.ReadLine() + "-";
             specialCharactersUsed++;
+
             Console.WriteLine("Ubicación de la foto de perfil:");
             string path = Console.ReadLine();
             jobProfileData += path + "-";
             specialCharactersUsed++;
+
             Console.WriteLine("Habilidades:");
             bool addAbilities = true;
+
             while (addAbilities)
             {
                 Console.WriteLine("Agregue una Habilidad:");
                 jobProfileData += Console.ReadLine() + ";";
+
                 Console.WriteLine("PRESIONE: ");
                 Console.WriteLine("\n                         |Cualquier tecla|    SEGUIR AGREGANDO HABILIDADES");
                 Console.WriteLine("\n                         |0|    DEJAR DE AGREGAR HABILIDADES");
@@ -355,17 +369,10 @@ namespace Lkdin
             {
                 specialCharactersUsed = 0;
 
-                if (OnlyRoute())
-                {
-                    sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
-                    Console.WriteLine(listener.ReceiveData(socketClient)[1]);
-                }
-                else
-                {
-                    sender.SendFile(path, socketClient);
-                    sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
-                    Console.WriteLine(listener.ReceiveData(socketClient)[1]);
-                }
+                await sender.SendFile(path, tcpClient);
+                await sender.Send(Command.CreateJobProfile, jobProfileData, tcpClient);
+                Console.WriteLine((await listener.ReceiveData(netStream))[1]);
+
             }
             else 
             {
@@ -373,17 +380,20 @@ namespace Lkdin
                 goto repeat;
             }
 
-
             return name;
         }
 
-        private static void ConsultSpecificProfile()
+        private static async Task ConsultSpecificProfile(NetworkStream netStream)
         {
-            if (UsersLoaded())
+            if (await UsersLoaded(netStream))
             {
-                string user = UsersMenu("Elija el usuario que desea ver el perfil de trabajo:");
-                sender.Send(Command.GetSpecificProfile, user, socketClient);
-                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+                string user = await UsersMenu("Elija el usuario que desea ver el perfil de trabajo:", netStream);
+                await sender.Send(Command.GetSpecificProfile, user, tcpClient);
+
+                string recievedData = (await listener.ReceiveData(netStream))[1];
+                await listener.ReceiveData(netStream);
+
+                Console.WriteLine(FormatSpecificProfile(recievedData));
             }
             else
             {
@@ -391,10 +401,10 @@ namespace Lkdin
             }
         }
 
-        private static void ShowJobProfiles()
+        private static async Task ShowJobProfiles(NetworkStream netStream)
         {
-            sender.Send(Command.GetJobProfiles, socketClient);
-            Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+            await sender.Send(Command.GetJobProfiles, tcpClient);
+            Console.WriteLine((await listener.ReceiveData(netStream))[1]);
         }
 
         private static bool ContainsSpecialCharacters(string data, int charactersUsedBySystem)
@@ -411,29 +421,27 @@ namespace Lkdin
             return contains;
         }
 
-        private static bool UsersLoaded()
+        private static async Task<bool> UsersLoaded(NetworkStream netStream)
         {
-            sender.Send(Command.GetUsersName, socketClient);
-            string data = listener.ReceiveData(socketClient)[1];
+            await sender.Send(Command.GetUsersName, tcpClient);
+            string data = (await listener.ReceiveData(netStream))[1];
             
             return data != "";
         }
 
-        private static bool OnlyRoute()
+        private static string FormatSpecificProfile(string rawProfileData)
         {
-            Console.WriteLine("Desea solamente asociar una ruta o un archivo:");
-            Console.WriteLine("PRESIONE: ");
-            Console.WriteLine("\n                         |Cualquier tecla|    ASOCIAR RUTA");
-            Console.WriteLine("\n                         |0|   ASOCIAR ARCHIVO");
-            string option = Console.ReadLine();
-            bool value = true;
+            string[] splittedData = rawProfileData.Split('-');
+            string filePath = fileLogic.GetPath(splittedData[2]);
 
-            if (option == "0")
-            {
-                value = false;
-            }
+            string profile = "NOMBRE: " + splittedData[0] + "\nDESCRIPCIÓN: " + splittedData[1]+ "\nFOTO DE PERFIL: " + filePath + "\nHABILIDADES: ";
 
-            return value;
+            string[] abilities = splittedData[3].Split(';');
+
+            for (int i = 0; i < abilities.Length; i++)
+                profile += "\n" + "|" + i + "|" + abilities[i];
+            
+            return profile;
         }
     }
 }
