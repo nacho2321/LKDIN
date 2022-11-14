@@ -19,6 +19,7 @@ namespace Lkdin
         static TcpClient tcpClient;
 
         static int specialCharactersUsed = 0;
+        static FileLogic fileLogic = new FileLogic();
 
         static async Task Main(string[] args)
         {
@@ -42,7 +43,7 @@ namespace Lkdin
                 {
                     bool showMenu = true;
                     Console.WriteLine("Conectado con el servidor");
-              
+
                     while (showMenu)
                     {
                         showMenu = await MainMenu(netStream);
@@ -206,8 +207,8 @@ namespace Lkdin
 
         private static async Task SendMessage(NetworkStream netStream)
         {
-			if (UsersLoaded())
-			{
+            if (await UsersLoaded(netStream))
+            {
                 string users = "";
                 string message = "";
                 Console.WriteLine("ENVIAR MENSAJES");
@@ -368,20 +369,18 @@ namespace Lkdin
             if (!ContainsSpecialCharacters(jobProfileData, specialCharactersUsed))
             {
                 specialCharactersUsed = 0;
-
-                if (OnlyRoute())
+                try
                 {
-                    sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
-                    Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+                    await sender.SendFile(path, netStream);
+                    await sender.Send(Command.CreateJobProfile, jobProfileData, netStream);
+                    Console.WriteLine((await listener.ReceiveData(netStream))[1]);
                 }
-                else
+                catch (FileException ex)
                 {
-                    sender.SendFile(path, socketClient);
-                    sender.Send(Command.CreateJobProfile, jobProfileData, socketClient);
-                    Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+                    Console.WriteLine(ex.Message);
                 }
             }
-            else 
+            else
             {
                 specialCharactersUsed = 0;
                 goto repeat;
@@ -394,9 +393,13 @@ namespace Lkdin
         {
             if (await UsersLoaded(netStream))
             {
-                string user = UsersMenu("Elija el usuario que desea ver el perfil de trabajo:");
-                sender.Send(Command.GetSpecificProfile, user, socketClient);
-                Console.WriteLine(listener.ReceiveData(socketClient)[1]);
+                string user = await UsersMenu("Elija el usuario que desea ver el perfil de trabajo:", netStream);
+                await sender.Send(Command.GetSpecificProfile, user, netStream);
+
+                string recievedData = (await listener.ReceiveData(netStream))[1];
+                await listener.ReceiveData(netStream);
+
+                Console.WriteLine(FormatSpecificProfile(recievedData));
             }
             else
             {
@@ -426,27 +429,25 @@ namespace Lkdin
 
         private static async Task<bool> UsersLoaded(NetworkStream netStream)
         {
-            sender.Send(Command.GetUsersName, socketClient);
-            string data = listener.ReceiveData(socketClient)[1];
-            
+            await sender.Send(Command.GetUsersName, netStream);
+            string data = (await listener.ReceiveData(netStream))[1];
+
             return data != "";
         }
 
-        private static bool OnlyRoute()
+        private static string FormatSpecificProfile(string rawProfileData)
         {
-            Console.WriteLine("Desea solamente asociar una ruta o un archivo:");
-            Console.WriteLine("PRESIONE: ");
-            Console.WriteLine("\n                         |Cualquier tecla|    ASOCIAR RUTA");
-            Console.WriteLine("\n                         |0|   ASOCIAR ARCHIVO");
-            string option = Console.ReadLine();
-            bool value = true;
+            string[] splittedData = rawProfileData.Split('-');
+            string filePath = fileLogic.GetPath(splittedData[2]);
 
-            if (option == "0")
-            {
-                value = false;
-            }
+            string profile = "NOMBRE: " + splittedData[0] + "\nDESCRIPCIÓN: " + splittedData[1] + "\nFOTO DE PERFIL: " + filePath + "\nHABILIDADES: ";
 
-            return value;
+            string[] abilities = splittedData[3].Split(';');
+
+            for (int i = 0; i < abilities.Length; i++)
+                profile += "\n" + "|" + i + "|" + abilities[i];
+
+            return profile;
         }
     }
 }
