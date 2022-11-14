@@ -9,9 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LkdinServer", "LkdinServer\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LkdinConnection", "LkdinConnection\LkdinConnection.csproj", "{B056B9A6-6B0B-435D-B128-4BC1B2E86511}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LkdinAdminServer", "LkdinAdminServer\LkdinAdminServer.csproj", "{8A1B622C-6ED6-496B-AC49-2DE589E5F9FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LkdinAdminServer", "LkdinAdminServer\LkdinAdminServer.csproj", "{8A1B622C-6ED6-496B-AC49-2DE589E5F9FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LkdinServerGrpc", "LkdinServerGrpc\LkdinServerGrpc.csproj", "{59D2A50A-6B54-402F-A904-948AF7BA4B70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LkdinServerGrpc", "LkdinServerGrpc\LkdinServerGrpc.csproj", "{59D2A50A-6B54-402F-A904-948AF7BA4B70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
