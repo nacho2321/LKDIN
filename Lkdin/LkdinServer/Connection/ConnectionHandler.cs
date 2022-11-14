@@ -2,13 +2,14 @@
 using LKDIN_Server.Exceptions;
 using LkdinConnection;
 using LkdinConnection.Logic;
+using LkdinConnection.Exceptions;
 using LkdinServer.Logic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace LkdinServer.Connection
 {
@@ -17,8 +18,9 @@ namespace LkdinServer.Connection
         private int connections = 0;
         private int maxClients;
 
-        private Socket socket;
+        //private Socket socket;
         private Sender sender;
+        private TcpListener tcpListener;
         private Listener listener;
         private UserLogic userLogic;
         private JobProfileLogic jobProfileLogic;
@@ -39,57 +41,69 @@ namespace LkdinServer.Connection
             this.sender = sender;
             this.listener = listener;
 
-            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            
+            //this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
             string ipServer = settingsMngr.ReadSettings(ServerConfig.serverIPconfigkey);
             int ipPort = int.Parse(settingsMngr.ReadSettings(ServerConfig.serverPortconfigkey));
             var localEndpoint = new IPEndPoint(IPAddress.Parse(ipServer), ipPort);
 
-            this.socket.Bind(localEndpoint);
+            this.tcpListener = new TcpListener(localEndpoint);
+            //this.socket.Bind(localEndpoint);
+
         }
 
-        public void Listen()
+        public async Task Listen()
         {
-            this.socket.Listen(maxClients);
+            tcpListener.Start(maxClients);
+            //this.socket.Listen(maxClients);
 
             while (connections < maxClients)
             {
-                var socketClient = this.socket.Accept();
+                //var socketClient = this.socket.Accept();
 
+                var tcpClientSocket = await tcpListener.AcceptTcpClientAsync().ConfigureAwait(false);
                 Console.WriteLine("Nueva conexión establecida");
-                new Thread(() => this.ClientHandler(socketClient)).Start();
+
+                //new Thread(() => this.ClientHandler(socketClient)).Start();
+                var task = Task.Run(async () => await ClientHandler(tcpClientSocket).ConfigureAwait(false));
                 connections++;
             }
 
             Console.WriteLine("Limite de conexiones alcanzado");
         }
 
-        public void ClientHandler(Socket socket)
+        public async Task ClientHandler(TcpClient tcpSocket)
         {
             try
             {
                 bool runServer = true;
-                while (runServer)
+                using (var stream = tcpSocket.GetStream())
                 {
-                    string[] message = this.listener.ReceiveData(socket); // 0 Comando - 1 Datos
-                    if (message[0] != null)
+                    while (runServer)
                     {
-                        Command order = (Command)Int32.Parse(message[0]);
-                        string receivedData = message[1];
+                        string[] message = await this.listener.ReceiveData(stream); // 0 Comando - 1 Datos
+                        
+                        if (message[0] != null)
+                        {
+                            Command order = (Command)Int32.Parse(message[0]);
+                            string receivedData = message[1];
 
-                        Console.WriteLine(order + " | " + receivedData);
+                            Console.WriteLine(order + " | " + receivedData);
 
-                        RoutingOrder(order, receivedData, socket);
+                            await RoutingOrder(order, receivedData, stream);
+                        }
                     }
                 }
             }
-            catch (SocketException)
+            catch (Exception)
             {
                 connections--;
                 Console.WriteLine("Cliente desconectado");
             }
         }
 
-        public void RoutingOrder(Command order, string data, Socket socket)
+        public async Task RoutingOrder(Command order, string data, NetworkStream netStream)
         {
             string[] splittedData = data.Split("-");
             try
@@ -98,78 +112,76 @@ namespace LkdinServer.Connection
                 {
                     case Command.CreateUser:
                         User newUser = userLogic.CreateUser(splittedData[0], Int32.Parse(splittedData[1]), splittedData[2].Split(";").ToList(), splittedData[3]);
-                        CreationResponseHandler(Command.CreateUser, newUser, "USUARIO CREADO CORRECTAMENTE", "YA EXISTE EL USUARIO", socket);
+                        await CreationResponseHandler(Command.CreateUser, newUser, "USUARIO CREADO CORRECTAMENTE", "YA EXISTE EL USUARIO", netStream);
                         break;
 
                     case Command.CreateJobProfile:
                         JobProfile newJobProfile = jobProfileLogic.CreateJobProfile(splittedData[0], splittedData[1], splittedData[2], splittedData[3].Split(";").ToList());
-                        CreationResponseHandler(Command.CreateJobProfile, newJobProfile, "PERFIL DE TRABAJO CREADO CORRECTAMENTE", "EL PERFIL DE TRABAJO YA EXISTE", socket);
+                        await CreationResponseHandler(Command.CreateJobProfile, newJobProfile, "PERFIL DE TRABAJO CREADO CORRECTAMENTE", "EL PERFIL DE TRABAJO YA EXISTE", netStream);
                         break;
 
                     case Command.SendMessage:
                         User userSender = userLogic.GetUserByName(splittedData[0]), userReceptor = userLogic.GetUserByName(splittedData[1]);
 
                         messageLogic.CreateMessage(userSender, userReceptor, splittedData[2]);
-                        sender.Send(Command.CreateJobProfile, "MENSAJE ENVIADO CORRECTAMENTE", socket);
+                        await sender.Send(Command.CreateJobProfile, "MENSAJE ENVIADO CORRECTAMENTE", netStream);
                         break;
 
                     case Command.ReadMessages:
                         bool readMessages = splittedData[1].Contains("readMessages");
                         string messages = userLogic.ShowMessages(splittedData[0], readMessages);
 
-                        sender.Send(Command.ReadMessages, messages, socket);
-                        sender.Send(Command.ReadMessages, "MENSAJES MOSTRADOS CORRECTAMENTE", socket);
+                        await sender.Send(Command.ReadMessages, messages, netStream);
+                        await sender.Send(Command.ReadMessages, "MENSAJES MOSTRADOS CORRECTAMENTE", netStream);
                         break;
 
                     case Command.GetUsersName:
                         List<string> usersName = userLogic.GetUsersName();
                         string joinedNames = String.Join(";", usersName.ToArray());
-                        sender.Send(Command.GetUsersName, joinedNames, socket);
+                        await sender.Send(Command.GetUsersName, joinedNames, netStream);
                         break;
 
                     case Command.GetJobProfiles:
                         List<string> jobProfiles = jobProfileLogic.GetJobProfiles();
                         string joinedJobProfiles = String.Join(";", jobProfiles.ToArray());
-                        sender.Send(Command.GetJobProfiles, joinedJobProfiles, socket);
+                        await sender.Send(Command.GetJobProfiles, joinedJobProfiles, netStream);
                         break;
 
                     case Command.GetSpecificProfile:
                         JobProfile profile = userLogic.GetProfileByName(splittedData[0]);
 
                         // envio info del perfil
-                        sender.Send(Command.GetSpecificProfile, GetJobProfileMessage(profile), socket);
+                        await sender.Send(Command.GetSpecificProfile, GetJobProfileMessage(profile), netStream);
 
                         // envio imagen del perfil
-                        sender.SendFile(profile.ImagePath, socket);
+                        await sender.SendFile(profile.ImagePath, netStream); //TODO ImagePath tiene que guardar la ruta en server, no la indicada x usuario
 
                         break;
 
                     case Command.AssignJobProfile:
                         JobProfile jobProfile = jobProfileLogic.GetJobProfile(splittedData[1]);
                         userLogic.AssignJobProfile(splittedData[0], jobProfile);
-                        CreationResponseHandler(Command.AssignJobProfile, jobProfile, "PERFIL DE TRABAJO ASIGNADO CORRECTAMENTE", "ERROR AL ASIGNAR, INTENTE NUEVAMENTE", socket);
+                        await CreationResponseHandler(Command.AssignJobProfile, jobProfile, "PERFIL DE TRABAJO ASIGNADO CORRECTAMENTE", "ERROR AL ASIGNAR, INTENTE NUEVAMENTE", netStream);
                         break;
 
-                    case Command.SendFile:
-                        break;
                 }
             }
             catch (Exception ex)
             {
-                if (ex is DomainException || ex is ArgumentNullException)
+                if (ex is DomainException || ex is ArgumentNullException || ex is FileException)
                 {
-                    sender.Send(Command.ThrowException, ex.Message, socket);
+                    await sender.Send(Command.ThrowException, ex.Message, netStream);
                 }
             }
         }
 
-        private void CreationResponseHandler(Command cmd, Object obj, string OkResponse, string errorResponse, Socket socket)
+        private async Task CreationResponseHandler(Command cmd, Object obj, string OkResponse, string errorResponse, NetworkStream netStream)
         {
             bool objCreated = obj != null;
             Command cmdToRespond = (objCreated) ? cmd : Command.ThrowException;
             string messageToReturn = (objCreated) ? OkResponse : errorResponse;
 
-            sender.Send(cmdToRespond, messageToReturn, socket);
+            await sender.Send(cmdToRespond, messageToReturn, netStream);
         }
 
 

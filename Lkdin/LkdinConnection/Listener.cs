@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace LkdinConnection
 {
@@ -23,51 +24,55 @@ namespace LkdinConnection
             this.fileStreamHandler = new FileStreamHandler();
         }
         
-        public string[] ReceiveData(Socket socket)
+        public async Task<string[]> ReceiveData(NetworkStream networkStream)
         {
             string[] ret = new string[2];
             int headerLength = protocolCmdLength + protocolDataLength;
-            byte[] header = BytesReceiver(headerLength, socket);
 
+            // Recibe header con la orden y el largo de los datos
+            byte[] header = await BytesReceiver(headerLength, networkStream);
+
+            // transforma a string el header y separa el comando
             string headerToString = Encoding.UTF8.GetString(header);
             string order = headerToString.Substring(0, protocolCmdLength);
+
             if ((Command)Int32.Parse(order) != Command.SendFile)
             {
                 int length = Int32.Parse(headerToString.Substring(protocolCmdLength));
-                byte[] data = BytesReceiver(length, socket);
+                byte[] data = await BytesReceiver(length, networkStream);
 
                 ret[0] = order;
                 ret[1] = Encoding.UTF8.GetString(data);
             }
             else
             {
+                // si la orden es recibir archivo, se maneja el recibo de archivo
                 int fileNameSize = Int32.Parse(headerToString.Substring(protocolCmdLength));
-                ReceiveFile(fileNameSize, socket);
+                await ReceiveFile(fileNameSize, networkStream);
             }
             
             return ret;
         }
 
-        public void ReceiveFile(int fileNameSize, Socket socket)
+        public async Task ReceiveFile(int fileNameSize, NetworkStream networkStream)
         {
-            string fileName = Encoding.UTF8.GetString(BytesReceiver(fileNameSize, socket));
-            long fileSize = BitConverter.ToInt64(BytesReceiver(fixedFileSize, socket));
+            string fileName = Encoding.UTF8.GetString(await BytesReceiver(fileNameSize, networkStream));
+            long fileSize = BitConverter.ToInt64(await BytesReceiver(fixedFileSize, networkStream));
 
-            FileStreamReceiver(fileSize, fileName, socket);
+            await FileStreamReceiver(fileSize, fileName, networkStream); // await ?
         }
 
-        private byte[] BytesReceiver(int length, Socket socket)
+        private async Task<byte[]> BytesReceiver(int length, NetworkStream networkStream)
         {
             byte[] response = new byte[length];
             int offset = 0;
            
             while (offset < length) 
             {
-                int received = socket.Receive(response, offset, length - offset, SocketFlags.None);
-                
+                int received = await networkStream.ReadAsync(response, offset, length - offset).ConfigureAwait(false);
                 if (received == 0)
                 {
-                    throw new SocketException();
+                    throw new SocketException(); //TODO tirar exception especifica
                 }
                 offset += received;
             }
@@ -75,7 +80,7 @@ namespace LkdinConnection
             return response;
         }
 
-        private void FileStreamReceiver(long fileSize, string fileName, Socket socket)
+        private async Task FileStreamReceiver(long fileSize, string fileName, NetworkStream networkStream)
         {
             long fileParts = Protocol.FileParts(fileSize);
             long offset = 0;
@@ -88,12 +93,12 @@ namespace LkdinConnection
                 if (currentPart == fileParts)
                 {
                     var lastPartSize = (int)(fileSize - offset);
-                    data = BytesReceiver(lastPartSize, socket);
+                    data = await BytesReceiver(lastPartSize, networkStream);
                     offset += lastPartSize;
                 }
                 else
                 {
-                    data = BytesReceiver(Protocol.MaxPacketSize, socket);
+                    data = await BytesReceiver(Protocol.MaxPacketSize, networkStream);
                     offset += Protocol.MaxPacketSize;
                 }
 

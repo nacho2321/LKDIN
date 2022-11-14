@@ -3,6 +3,7 @@ using LkdinConnection.Logic;
 using LkdinServer.Connection;
 using LkdinServer.Logic;
 using System;
+using System.Threading.Tasks;
 
 namespace LkdinServer
 {
@@ -11,7 +12,7 @@ namespace LkdinServer
         static Sender sender = new Sender();
         static Listener listener = new Listener();
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             UserLogic userLogic = new UserLogic();
             JobProfileLogic jobProfileLogic = new JobProfileLogic();
@@ -21,7 +22,7 @@ namespace LkdinServer
             ConnectionHandler serverConnection = new ConnectionHandler(userLogic, jobProfileLogic, messageLogic, sender, listener, fileLogic);
             
             Console.WriteLine("Iniciando Aplicacion Servidor...");
-            serverConnection.Listen();
+            await serverConnection.Listen();
         }
     }
 }
