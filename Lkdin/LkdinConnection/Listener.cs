@@ -59,7 +59,7 @@ namespace LkdinConnection
             string fileName = Encoding.UTF8.GetString(await BytesReceiver(fileNameSize, networkStream));
             long fileSize = BitConverter.ToInt64(await BytesReceiver(fixedFileSize, networkStream));
 
-            await FileStreamReceiver(fileSize, fileName, networkStream); // await ?
+            await FileStreamReceiver(fileSize, fileName, networkStream);
         }
 
         private async Task<byte[]> BytesReceiver(int length, NetworkStream networkStream)
@@ -72,7 +72,7 @@ namespace LkdinConnection
                 int received = await networkStream.ReadAsync(response, offset, length - offset).ConfigureAwait(false);
                 if (received == 0)
                 {
-                    throw new SocketException(); //TODO tirar exception especifica
+                    throw new SocketException();
                 }
                 offset += received;
             }

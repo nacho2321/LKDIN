@@ -116,7 +116,8 @@ namespace LkdinServer.Connection
                         break;
 
                     case Command.CreateJobProfile:
-                        JobProfile newJobProfile = jobProfileLogic.CreateJobProfile(splittedData[0], splittedData[1], splittedData[2], splittedData[3].Split(";").ToList());
+                        string fileRoute = fileLogic.GetPath(splittedData[2]);
+                        JobProfile newJobProfile = jobProfileLogic.CreateJobProfile(splittedData[0], splittedData[1], fileRoute, splittedData[3].Split(";").ToList());
                         await CreationResponseHandler(Command.CreateJobProfile, newJobProfile, "PERFIL DE TRABAJO CREADO CORRECTAMENTE", "EL PERFIL DE TRABAJO YA EXISTE", netStream);
                         break;
 
