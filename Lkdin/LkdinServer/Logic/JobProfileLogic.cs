@@ -9,6 +9,12 @@ namespace LkdinServer.Logic
     public class JobProfileLogic
     {
         private List<JobProfile> jobProfiles = new List<JobProfile>();
+        private UserLogic userLogic;
+
+        public JobProfileLogic(UserLogic _userLogic)
+        {
+            userLogic = _userLogic;
+        }
 
         public JobProfile CreateJobProfile(string name, string description, string imagePath, List<string> abilities)
         {
@@ -50,6 +56,53 @@ namespace LkdinServer.Logic
             }
 
             return data;
+        }
+
+        public void UpdateJobProfile(string name, string description, string imagePath, List<string> abilities)
+        {
+            lock (jobProfiles)
+            {
+                foreach (var jp in jobProfiles)
+                {
+                    if (jp.Name == name)
+                    {
+                        jp.Description = description;
+                        jp.ImagePath = imagePath;
+                        jp.Abilities = abilities;
+                    }
+                }
+            }
+        }
+
+        public void DeleteJobProfile(string name)
+        {
+            lock (jobProfiles)
+            {
+                foreach (var jp in jobProfiles)
+                {
+                    if (jp.Name == name)
+                    {
+                        JobProfile jobProfileToRemove = GetJobProfile(name);
+                        jobProfiles.Remove(jobProfileToRemove);
+                    }
+                }
+            }
+        }
+
+        public void DeleteImage(string user)
+        {
+            lock (jobProfiles)
+            {
+                User userToDeleteImage = userLogic.GetUserByName(user);
+
+                foreach (var jp in jobProfiles)
+                {
+                    if (jp.Name == userToDeleteImage.Profile.Name)
+                    {
+                        jp.ImagePath = null;
+                    }
+                }
+            }
         }
     }
 }

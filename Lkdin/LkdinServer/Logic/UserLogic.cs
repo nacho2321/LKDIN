@@ -111,5 +111,36 @@ namespace LkdinServer.Logic
 
             return filteredMessages;
         }
+
+        public void UpdateUser(string user, int age, List<string> professions, string country)
+        {
+            lock (users)
+            {
+                foreach (var u in users)
+                {
+                    if (u.Name == user)
+                    {
+                        u.Professions = professions;
+                        u.Country = country;
+                        u.Age = age;
+                    }
+                }
+            }
+        }
+
+        public void DeleteUser(string user)
+        {
+            lock (users)
+            {
+                foreach (var u in users)
+                {
+                    if (u.Name == user)
+                    {
+                        User userToRemove = GetUserByName(user);
+                        users.Remove(userToRemove);
+                    }
+                }
+            }
+        }
     }
 }
