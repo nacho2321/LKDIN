@@ -43,7 +43,7 @@ namespace Lkdin
                 {
                     bool showMenu = true;
                     Console.WriteLine("Conectado con el servidor");
-              
+
                     while (showMenu)
                     {
                         showMenu = await MainMenu(netStream);
@@ -207,8 +207,8 @@ namespace Lkdin
 
         private static async Task SendMessage(NetworkStream netStream)
         {
-			if (await UsersLoaded(netStream))
-			{
+            if (await UsersLoaded(netStream))
+            {
                 string users = "";
                 string message = "";
                 Console.WriteLine("ENVIAR MENSAJES");
@@ -431,7 +431,7 @@ namespace Lkdin
         {
             await sender.Send(Command.GetUsersName, netStream);
             string data = (await listener.ReceiveData(netStream))[1];
-            
+
             return data != "";
         }
 
@@ -440,13 +440,13 @@ namespace Lkdin
             string[] splittedData = rawProfileData.Split('-');
             string filePath = fileLogic.GetPath(splittedData[2]);
 
-            string profile = "NOMBRE: " + splittedData[0] + "\nDESCRIPCIÓN: " + splittedData[1]+ "\nFOTO DE PERFIL: " + filePath + "\nHABILIDADES: ";
+            string profile = "NOMBRE: " + splittedData[0] + "\nDESCRIPCIÓN: " + splittedData[1] + "\nFOTO DE PERFIL: " + filePath + "\nHABILIDADES: ";
 
             string[] abilities = splittedData[3].Split(';');
 
             for (int i = 0; i < abilities.Length; i++)
                 profile += "\n" + "|" + i + "|" + abilities[i];
-            
+
             return profile;
         }
     }
