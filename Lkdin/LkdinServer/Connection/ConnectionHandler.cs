@@ -25,17 +25,19 @@ namespace LkdinServer.Connection
         private UserLogic userLogic;
         private JobProfileLogic jobProfileLogic;
         private MessageLogic messageLogic;
+        private LogLogic logLogic;
 
         private FileLogic fileLogic;
 
         static readonly SettingsManager settingsMngr = new SettingsManager();
 
-        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender, Listener listener, FileLogic fileLogic)
+        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, LogLogic logLogic, Sender sender, Listener listener, FileLogic fileLogic)
         {
             this.maxClients = Int32.Parse(settingsMngr.ReadSettings(ServerConfig.serverMaxClientsconfigkey));
             this.userLogic = userLogic;
             this.jobProfileLogic = jobProfileLogic;
             this.messageLogic = messageLogic;
+            this.logLogic = logLogic;
 
             this.fileLogic = fileLogic;
             this.sender = sender;
@@ -113,19 +115,21 @@ namespace LkdinServer.Connection
                     case Command.CreateUser:
                         User newUser = userLogic.CreateUser(splittedData[0], Int32.Parse(splittedData[1]), splittedData[2].Split(";").ToList(), splittedData[3]);
                         await CreationResponseHandler(Command.CreateUser, newUser, "USUARIO CREADO CORRECTAMENTE", "YA EXISTE EL USUARIO", netStream);
+                        logLogic.AddLog("Creation: USER - Nombre: " + newUser.Name);
                         break;
 
                     case Command.CreateJobProfile:
                         string fileRoute = fileLogic.GetPath(splittedData[2]);
                         JobProfile newJobProfile = jobProfileLogic.CreateJobProfile(splittedData[0], splittedData[1], fileRoute, splittedData[3].Split(";").ToList());
                         await CreationResponseHandler(Command.CreateJobProfile, newJobProfile, "PERFIL DE TRABAJO CREADO CORRECTAMENTE", "EL PERFIL DE TRABAJO YA EXISTE", netStream);
+                        logLogic.AddLog("Creation: JOB PROFILE - Nombre: " + newJobProfile.Name);
                         break;
 
                     case Command.SendMessage:
                         User userSender = userLogic.GetUserByName(splittedData[0]), userReceptor = userLogic.GetUserByName(splittedData[1]);
-
                         messageLogic.CreateMessage(userSender, userReceptor, splittedData[2]);
                         await sender.Send(Command.CreateJobProfile, "MENSAJE ENVIADO CORRECTAMENTE", netStream);
+                        logLogic.AddLog("Messages: SEND - Sender: " + userSender.Name + " - Receptor: " + userReceptor.Name);
                         break;
 
                     case Command.ReadMessages:
@@ -134,6 +138,7 @@ namespace LkdinServer.Connection
 
                         await sender.Send(Command.ReadMessages, messages, netStream);
                         await sender.Send(Command.ReadMessages, "MENSAJES MOSTRADOS CORRECTAMENTE", netStream);
+                        logLogic.AddLog("Messages: SHOW - User: " + splittedData[0]);
                         break;
 
                     case Command.GetUsersName:
@@ -163,6 +168,7 @@ namespace LkdinServer.Connection
                         JobProfile jobProfile = jobProfileLogic.GetJobProfile(splittedData[1]);
                         userLogic.AssignJobProfile(splittedData[0], jobProfile);
                         await CreationResponseHandler(Command.AssignJobProfile, jobProfile, "PERFIL DE TRABAJO ASIGNADO CORRECTAMENTE", "ERROR AL ASIGNAR, INTENTE NUEVAMENTE", netStream);
+                        logLogic.AddLog("Creation: ASSIGNMENT - Job profile: " + splittedData[1] + " to " + splittedData[0]);
                         break;
 
                 }
