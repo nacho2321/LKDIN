@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LkdinServer.Logic
+namespace LkdinServerGrpc.Logic
 {
     public class LogLogic
     {
