@@ -1,28 +1,27 @@
-﻿using System;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Grpc.Net.Client;
 
 namespace LkdinAdminServer
 {
-    class Program
+    public class Program
     {
-        static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-            using var channel = GrpcChannel.ForAddress("http://localhost:5001");
-            var client = new Greeter.GreeterClient(channel);
-            var reply = await client.SayHelloAsync(
-                new HelloRequest { Name = "GreeterClient" });
-            Console.WriteLine("Greeting: " + reply.Message);
-            var numberReply = await client.AddNumbersAsync(
-                new AddRequest { Numberone = 1, Numbertwo = 2 });
-            Console.WriteLine("Add Numbers result: " + numberReply.Result);
-
-            var userList = client.GiveMeUsers(new UserRequest());
-
-
-            Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
+            //
+            CreateHostBuilder(args).Build().Run(); // BLOQUEA
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }

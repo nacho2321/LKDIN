@@ -5,9 +5,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
+    <Content Remove="App.config" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Protobuf Include="Protos\admin.proto" GrpcServices="Server" />
+  </ItemGroup>
+	
+	<ItemGroup>
+		<None Remove="LkdinServerGrpc\Protos\admin.proto" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <None Include="App.config">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+	
   <ItemGroup>
     <PackageReference Include="Google.Protobuf" Version="3.21.9" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.27.0" />
@@ -15,6 +29,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\LkdinConnection\LkdinConnection.csproj" />
   </ItemGroup>
 
 </Project>
