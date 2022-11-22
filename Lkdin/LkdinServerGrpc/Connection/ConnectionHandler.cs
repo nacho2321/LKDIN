@@ -170,7 +170,7 @@ namespace LkdinServerGrpc.Connection
             {
                 if (ex is DomainException || ex is ArgumentNullException || ex is FileException)
                 {
-                    await CreationResponseHandler(Command.ThrowException, ex.Message, netStream);
+                    await CreationResponseHandler(Command.ThrowException, "Error: " + ex.Message, netStream);
                 }
             }
         }

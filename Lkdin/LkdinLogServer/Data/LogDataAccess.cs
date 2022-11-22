@@ -54,7 +54,7 @@ namespace LkdinLogServer.Data
                 List<string> logCreations = new List<string>();
                 for (int i = 0; i < logs.Count; i++)
                 {
-                    if (logs.Contains("Creation"))
+                    if (logs[i].Contains("Creation"))
                     {
                         logCreations.Add(logs[i]);
                     }
@@ -71,7 +71,7 @@ namespace LkdinLogServer.Data
                 List<string> logMessages = new List<string>();
                 for (int i = 0; i < logs.Count; i++)
                 {
-                    if (logs.Contains("Message"))
+                    if (logs[i].Contains("Message"))
                     {
                         logMessages.Add(logs[i]);
                     }
@@ -88,7 +88,7 @@ namespace LkdinLogServer.Data
                 List<string> logMessages = new List<string>();
                 for (int i = 0; i < logs.Count; i++)
                 {
-                    if (logs.Contains("ERROR"))
+                    if (logs[i].Contains("Error"))
                     {
                         logMessages.Add(logs[i]);
                     }
