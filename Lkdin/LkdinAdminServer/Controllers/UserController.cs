@@ -19,10 +19,7 @@ namespace LkdinAdminServer.Controllers
         static readonly SettingsManager SettingsMgr = new SettingsManager();
         public UserController()
         {
-
-
-            AppContext.SetSwitch(
-                  "System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             grpcURL = SettingsMgr.ReadSettings(ServerConfig.GrpcURL);
         }
 
