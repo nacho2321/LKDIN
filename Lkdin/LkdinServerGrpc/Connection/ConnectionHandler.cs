@@ -119,6 +119,7 @@ namespace LkdinServer.Connection
 
                         messageLogic.CreateMessage(userSender, userReceptor, splittedData[2]);
                         await sender.Send(Command.CreateJobProfile, "MENSAJE ENVIADO CORRECTAMENTE", netStream);
+                        LogLogic.GetInstance().AddLog("Messages: SEND - Sender: " + userSender.Name + " - Receptor: " + userReceptor.Name);
                         break;
 
                     case Command.ReadMessages:
@@ -127,6 +128,7 @@ namespace LkdinServer.Connection
 
                         await sender.Send(Command.ReadMessages, messages, netStream);
                         await sender.Send(Command.ReadMessages, "MENSAJES MOSTRADOS CORRECTAMENTE", netStream);
+                        LogLogic.GetInstance().AddLog("Messages: SHOW - User: " + splittedData[0]);
                         break;
 
                     case Command.GetUsersName:
@@ -174,7 +176,7 @@ namespace LkdinServer.Connection
             bool objCreated = obj != null;
             Command cmdToRespond = (objCreated) ? cmd : Command.ThrowException;
             string messageToReturn = (objCreated) ? OkResponse : errorResponse;
-
+            LogLogic.GetInstance().AddLog(messageToReturn);
             await sender.Send(cmdToRespond, messageToReturn, netStream);
         }
 

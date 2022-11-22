@@ -1,4 +1,4 @@
-﻿using LkdinLogServer.Data;
+﻿using LkdinServerGrpc.Logic;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -21,7 +21,7 @@ namespace LkdinLogServer.Service
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
 
-            channel.QueueDeclare(queue: "log", // en el canal, definimos la Queue de la conexion
+            channel.QueueDeclare(queue: "logs", // en el canal, definimos la Queue de la conexion
                 durable: false,
                 exclusive: false,
                 autoDelete: false,
@@ -35,14 +35,13 @@ namespace LkdinLogServer.Service
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 Console.WriteLine(" [x] Received {0}", message);
-                string log = JsonSerializer.Deserialize<string>(message);
 
-                var data = LogDataAccess.GetInstance();
-                data.GetLogs();
+                var data = LogLogic.GetInstance();
+                data.GetAll();
             };
 
             //"PRENDO" el consumo de mensajes
-            channel.BasicConsume(queue: "log",
+            channel.BasicConsume(queue: "logs",
                 autoAck: true,
                 consumer: consumer);
 
