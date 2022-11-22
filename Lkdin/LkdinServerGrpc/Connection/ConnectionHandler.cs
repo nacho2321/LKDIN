@@ -25,17 +25,19 @@ namespace LkdinServer.Connection
         private UserLogic userLogic;
         private JobProfileLogic jobProfileLogic;
         private MessageLogic messageLogic;
+        private LogLogic logLogic;
 
         private FileLogic fileLogic;
 
         static readonly SettingsManager settingsMngr = new SettingsManager();
 
-        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender, Listener listener, FileLogic fileLogic)
+        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, LogLogic logLogic, Sender sender, Listener listener, FileLogic fileLogic)
         {
             this.maxClients = Int32.Parse(settingsMngr.ReadSettings(ServerConfig.serverMaxClientsconfigkey));
             this.userLogic = userLogic;
             this.jobProfileLogic = jobProfileLogic;
             this.messageLogic = messageLogic;
+            this.logLogic = logLogic;
 
             this.fileLogic = fileLogic;
             this.sender = sender;
