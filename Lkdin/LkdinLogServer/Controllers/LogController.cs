@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 namespace LkdinLogServer.Controllers
 {
     [ApiController]
-    [Route("logs")]
     public class LogController : ControllerBase
     {
         private readonly ILogger<LogController> _logger;
@@ -19,26 +18,29 @@ namespace LkdinLogServer.Controllers
             this._logger = logger;
         }
 
+        [Route("logs")]
         [HttpGet]
         public IEnumerable<string> Get()
         {
             return LogLogic.GetInstance().GetAll();
         }
 
-
-        [HttpGet(Name = "/creations")]
+        [Route("logs/creations")]
+        [HttpGet]
         public IEnumerable<string> GetCreations()
         {
             return LogLogic.GetInstance().GetAllCreations();
         }
 
-        [HttpGet(Name = "/messages")]
+        [Route("logs/messages")]
+        [HttpGet]
         public IEnumerable<string> GetAllMessages()
         {
             return LogLogic.GetInstance().GetAllMessages();
         }
 
-        [HttpGet(Name = "/errors")]
+        [Route("logs/errors")]
+        [HttpGet]
         public IEnumerable<string> GetAllErrors()
         {
             return LogLogic.GetInstance().GetAllErrors();
