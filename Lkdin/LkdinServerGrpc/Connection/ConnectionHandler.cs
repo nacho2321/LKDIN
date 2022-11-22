@@ -1,5 +1,5 @@
-﻿using LKDIN_Server.Domain;
-using LKDIN_Server.Exceptions;
+﻿using LkdinServerGrpc.Domain;
+using LkdinServerGrpc.Exceptions;
 using LkdinConnection;
 using LkdinConnection.Logic;
 using LkdinConnection.Exceptions;

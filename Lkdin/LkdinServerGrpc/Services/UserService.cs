@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
-using LKDIN_Server.Domain;
+using LkdinServerGrpc.Domain;
 using LkdinServerGrpc.Logic;
 using Microsoft.Extensions.Logging;
 

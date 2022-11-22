@@ -1,8 +1,8 @@
-﻿using LKDIN_Server.Exceptions;
+﻿using LkdinServerGrpc.Exceptions;
 using System;
 using System.Collections.Generic;
 
-namespace LKDIN_Server.Domain
+namespace LkdinServerGrpc.Domain
 {
     public class User
     {

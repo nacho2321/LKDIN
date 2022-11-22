@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LKDIN_Server.Domain
+namespace LkdinServerGrpc.Domain
 {
     public class Message
     {

@@ -1,4 +1,4 @@
-﻿using LKDIN_Server.Domain;
+﻿using LkdinServerGrpc.Domain;
 using System;
 using System.Collections.Generic;
 using System.Text;
