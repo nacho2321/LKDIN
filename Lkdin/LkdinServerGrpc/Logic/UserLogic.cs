@@ -1,6 +1,8 @@
 ﻿using LkdinServerGrpc.Domain;
+using LkdinServerGrpc.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 
@@ -10,10 +12,11 @@ namespace LkdinServerGrpc.Logic
     {
         private List<User> users = new List<User>();
         private static UserLogic instance;
+        private static readonly object singletonlock = new object();
 
         public static UserLogic GetInstance()
         {
-            lock (instance)
+            lock (singletonlock)
             {
                 if (instance == null)
                     instance = new UserLogic();
@@ -40,6 +43,9 @@ namespace LkdinServerGrpc.Logic
                     };
 
                     users.Add(newUser);
+                }
+                else {
+                    throw new DomainException($"Ya existe un usuario de nombre {name}");
                 }
 
                 return newUser;

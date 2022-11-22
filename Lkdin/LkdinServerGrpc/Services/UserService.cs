@@ -17,17 +17,15 @@ namespace LkdinServerGrpc
             UserLogic session = UserLogic.GetInstance();
             Console.WriteLine("Antes de crear el usuario con nombre {0}", request.Name);
 
-            
-            User usr = session.CreateUser(request.Name, request.Age, request.Professions.ToList<string>(), request.Country);
-            return Task.FromResult(new MessageReply { Message = usr.ToString() }); //CAMBIAR
+            try
+            {
+                User usr = session.CreateUser(request.Name, request.Age, request.Professions.ToList<string>(), request.Country);
+                return Task.FromResult(new MessageReply { Message = usr.ToString() }); //CAMBIAR
+            }
+            catch (Exception ex) { //TODO - ver como tirar exception del otro lado
+                return Task.FromResult(new MessageReply { Message = ex.Message });
+            }
         }
-        /*
-        public override Task<UserResponseList> GetUsers(UserRequest request, ServerCallContext context)
-        {
-            return Task.FromResult<UserResponseList>();
-        }
-        */
-
 
     }
 }
