@@ -25,19 +25,17 @@ namespace LkdinServerGrpc.Connection
         private UserLogic userLogic;
         private JobProfileLogic jobProfileLogic;
         private MessageLogic messageLogic;
-        private LogLogic logLogic;
 
         private FileLogic fileLogic;
 
         static readonly SettingsManager settingsMngr = new SettingsManager();
 
-        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, LogLogic logLogic, Sender sender, Listener listener, FileLogic fileLogic)
+        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender, Listener listener, FileLogic fileLogic)
         {
             this.maxClients = Int32.Parse(settingsMngr.ReadSettings(ServerConfig.serverMaxClientsconfigkey));
             this.userLogic = userLogic;
             this.jobProfileLogic = jobProfileLogic;
             this.messageLogic = messageLogic;
-            this.logLogic = logLogic;
 
             this.fileLogic = fileLogic;
             this.sender = sender;
@@ -121,7 +119,7 @@ namespace LkdinServerGrpc.Connection
 
                         messageLogic.CreateMessage(userSender, userReceptor, splittedData[2]);
                         await sender.Send(Command.CreateJobProfile, "MENSAJE ENVIADO CORRECTAMENTE", netStream);
-                        logLogic.AddLog("Messages: SEND - Sender: " + userSender.Name + " - Receptor: " + userReceptor.Name);
+                        LogLogic.GetInstance().AddLog("Messages: SEND - Sender: " + userSender.Name + " - Receptor: " + userReceptor.Name);
                         break;
 
                     case Command.ReadMessages:
@@ -130,7 +128,7 @@ namespace LkdinServerGrpc.Connection
 
                         await sender.Send(Command.ReadMessages, messages, netStream);
                         await sender.Send(Command.ReadMessages, "MENSAJES MOSTRADOS CORRECTAMENTE", netStream);
-                        logLogic.AddLog("Messages: SHOW - User: " + splittedData[0]);
+                        LogLogic.GetInstance().AddLog("Messages: SHOW - User: " + splittedData[0]);
                         break;
 
                     case Command.GetUsersName:
@@ -178,7 +176,7 @@ namespace LkdinServerGrpc.Connection
             bool objCreated = obj != null;
             Command cmdToRespond = (objCreated) ? cmd : Command.ThrowException;
             string messageToReturn = (objCreated) ? OkResponse : errorResponse;
-            this.logLogic.AddLog(messageToReturn);
+            LogLogic.GetInstance().AddLog(messageToReturn);
             await sender.Send(cmdToRespond, messageToReturn, netStream);
         }
 

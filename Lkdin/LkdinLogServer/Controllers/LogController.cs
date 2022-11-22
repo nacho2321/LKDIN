@@ -13,36 +13,35 @@ namespace LkdinLogServer.Controllers
     public class LogController : ControllerBase
     {
         private readonly ILogger<LogController> _logger;
-        private LogLogic logLogic;
 
-        public LogController(ILogger<LogController> logger, LogLogic logLogic)
+        public LogController(ILogger<LogController> logger)
         {
             this._logger = logger;
-            this.logLogic = logLogic;
         }
 
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return logLogic.GetAll();
+            return LogLogic.GetInstance().GetAll();
         }
-        /*
-        [HttpGet]
+
+
+        [HttpGet(Name = "/creations")]
         public IEnumerable<string> GetCreations()
         {
-            return logLogic.GetAllCreations();
+            return LogLogic.GetInstance().GetAllCreations();
         }
 
-        [HttpGet]
+        [HttpGet(Name = "/messages")]
         public IEnumerable<string> GetAllMessages()
         {
-            return logLogic.GetAllMessages();
+            return LogLogic.GetInstance().GetAllMessages();
         }
 
-        [HttpGet]
+        [HttpGet(Name = "/errors")]
         public IEnumerable<string> GetAllErrors()
         {
-            return logLogic.GetAllErrors();
-        }*/
+            return LogLogic.GetInstance().GetAllErrors();
+        }
     }
 }

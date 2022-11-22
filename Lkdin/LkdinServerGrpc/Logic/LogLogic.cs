@@ -8,9 +8,31 @@ namespace LkdinServerGrpc.Logic
     {
         private List<string> logs = new List<string>();
 
+        private object padlock;
+        private static LogLogic instance;
+
+        private static object singletonPadlock = new object();
+        public static LogLogic GetInstance()
+        {
+            lock (singletonPadlock)
+            { // bloqueante 
+                if (instance == null)
+                {
+                    instance = new LogLogic();
+                }
+            }
+            return instance;
+        }
+
+        private LogLogic()
+        {
+            logs = new List<string>();
+            padlock = new object();
+        }
+
         public void AddLog(string log)
         {
-            lock (logs)
+            lock (padlock)
             {
                 logs.Add(log);
             }
@@ -18,7 +40,7 @@ namespace LkdinServerGrpc.Logic
 
         public List<string> GetAll()
         {
-            lock (logs)
+            lock (padlock)
             {
                 return logs;
             }
@@ -26,7 +48,7 @@ namespace LkdinServerGrpc.Logic
 
         public List<string> GetAllCreations()
         {
-            lock (logs)
+            lock (padlock)
             {
                 List<string> logCreations = new List<string>();
                 for (int i = 0; i < logs.Count; i++)
@@ -43,7 +65,7 @@ namespace LkdinServerGrpc.Logic
 
         public List<string> GetAllMessages()
         {
-            lock (logs)
+            lock (padlock)
             {
                 List<string> logMessages = new List<string>();
                 for (int i = 0; i < logs.Count; i++)
@@ -60,7 +82,7 @@ namespace LkdinServerGrpc.Logic
 
         public List<string> GetAllErrors()
         {
-            lock (logs)
+            lock (padlock)
             {
                 List<string> logMessages = new List<string>();
                 for (int i = 0; i < logs.Count; i++)
