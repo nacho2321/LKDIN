@@ -133,15 +133,23 @@ namespace LkdinServerGrpc.Logic
         {
             lock (users)
             {
-                foreach (var u in users)
+                if (Exists(user))
                 {
-                    if (u.Name == user)
+                    foreach (var u in users)
                     {
-                        u.Professions = professions;
-                        u.Country = country;
-                        u.Age = age;
+                        if (u.Name == user)
+                        {
+                            u.Professions = professions;
+                            u.Country = country;
+                            u.Age = age;
+                        }
                     }
                 }
+                else
+                {
+                    throw new DomainException($"El usuario {user} no existe");
+                }
+
             }
         }
 

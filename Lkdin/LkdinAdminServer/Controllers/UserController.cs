@@ -40,5 +40,14 @@ namespace LkdinAdminServer.Controllers
             var reply = await client.DeleteUserAsync(userName);
             return Ok(reply.Message);
         }
+
+        [HttpPut]
+        public async Task<ActionResult> Put([FromBody] UserDTO user)
+        {
+            using var channel = GrpcChannel.ForAddress(grpcURL);
+            client = new Admin.AdminClient(channel);
+            var reply = await client.UpdateUserAsync(user);
+            return Ok(reply.Message);
+        }
     }
 }

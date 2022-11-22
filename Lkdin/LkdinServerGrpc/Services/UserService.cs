@@ -46,6 +46,21 @@ namespace LkdinServerGrpc
             }
         }
 
+        public override Task<MessageReply> UpdateUser(UserDTO request, ServerCallContext context)
+        {
+            UserLogic session = UserLogic.GetInstance();
+            Console.WriteLine($"Actualizando usuario {request.Name}");
 
+            try
+            {
+                session.UpdateUser(request.Name, request.Age, request.Professions.ToList<string>(), request.Country);
+                return Task.FromResult(new MessageReply { Message = $"Usuario {request.Name}, actualizado" });
+            }
+            catch (Exception ex) // TODO - ver como tirar exception del otro lado
+            {
+                Console.WriteLine($"Error al actualizar usuario {request.Name}");
+                return Task.FromResult(new MessageReply { Message = ex.Message });
+            }
+        }
     }
 }
