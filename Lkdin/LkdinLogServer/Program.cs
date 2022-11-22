@@ -1,3 +1,4 @@
+using LkdinLogServer.Service;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -11,8 +12,10 @@ namespace LkdinLogServer
 {
     public class Program
     {
+        private static MQService mq;
         public static void Main(string[] args)
         {
+            mq = new MQService();
             CreateHostBuilder(args).Build().Run();
         }
 

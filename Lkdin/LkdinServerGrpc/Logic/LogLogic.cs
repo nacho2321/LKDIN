@@ -41,40 +41,6 @@ namespace LkdinServerGrpc.Logic
             }
         }
 
-        public List<string> GetAllDeleted()
-        {
-            lock (logs)
-            {
-                List<string> logsDeleted = new List<string>();
-                for (int i = 0; i < logs.Count; i++)
-                {
-                    if (logs.Contains("Deleted"))
-                    {
-                        logsDeleted.Add(logs[i]);
-                    }
-                }
-
-                return logsDeleted;
-            }
-        }
-
-        public List<string> GetAllUpdates()
-        {
-            lock (logs)
-            {
-                List<string> logUpdates = new List<string>();
-                for (int i = 0; i < logs.Count; i++)
-                {
-                    if (logs.Contains("Update"))
-                    {
-                        logUpdates.Add(logs[i]);
-                    }
-                }
-
-                return logUpdates;
-            }
-        }
-
         public List<string> GetAllMessages()
         {
             lock (logs)
@@ -92,6 +58,22 @@ namespace LkdinServerGrpc.Logic
             }
         }
 
+        public List<string> GetAllErrors()
+        {
+            lock (logs)
+            {
+                List<string> logMessages = new List<string>();
+                for (int i = 0; i < logs.Count; i++)
+                {
+                    if (logs.Contains("ERROR"))
+                    {
+                        logMessages.Add(logs[i]);
+                    }
+                }
+
+                return logMessages;
+            }
+        }
 
     }
 }
