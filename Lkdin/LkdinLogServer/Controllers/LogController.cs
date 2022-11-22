@@ -1,4 +1,4 @@
-﻿using LkdinServer.Logic;
+﻿using LkdinServerGrpc.Logic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;

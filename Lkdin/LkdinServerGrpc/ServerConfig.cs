@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LkdinServer
+namespace LkdinServerGrpc
 {
     public static class ServerConfig
     {

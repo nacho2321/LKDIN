@@ -1,6 +1,6 @@
 using LkdinConnection;
 using LkdinConnection.Logic;
-using LkdinServer.Connection;
+using LkdinServerGrpc.Connection;
 using LkdinServerGrpc.Logic;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;

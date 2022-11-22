@@ -11,7 +11,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace LkdinServer.Connection
+namespace LkdinServerGrpc.Connection
 {
     class ConnectionHandler
     {
