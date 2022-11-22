@@ -8,27 +8,25 @@ service Admin {
 
   // Functions availables
   rpc PostUser(UserDTO) returns (MessageReply);
-  rpc DeleteUser(Name) returns (MessageReply);
-  rpc GetUser(Name) returns (MessageReply);
-  rpc GetUsers(UserRequest) returns (MessageReply);
+  rpc DeleteUser(UserName) returns (MessageReply);
+  rpc UpdateUser(UserDTO) returns (MessageReply);
  
 }
 
   message UserDTO{
 	string name = 1;
 	int32 age = 2;
-	repeated Profession professions = 3;
+	repeated string professions = 3;
 	string country = 4;
 }
 
-message Name {
+message UserName {
 	string name = 1;
 }
 
-message Profession {
-	string prof = 1;
+message ProfileName {
+	string name = 1;
 }
-
 
 message MessageReply {
 	string message = 1;

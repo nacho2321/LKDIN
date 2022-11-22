@@ -15,17 +15,37 @@ namespace LkdinServerGrpc
         public override Task<MessageReply> PostUser(UserDTO request, ServerCallContext context)
         {
             UserLogic session = UserLogic.GetInstance();
-            Console.WriteLine("Antes de crear el usuario con nombre {0}", request.Name);
+            Console.WriteLine($"Creando usuario {request.Name}");
 
             try
             {
                 User usr = session.CreateUser(request.Name, request.Age, request.Professions.ToList<string>(), request.Country);
-                return Task.FromResult(new MessageReply { Message = usr.ToString() }); //CAMBIAR
+                return Task.FromResult(new MessageReply { Message = usr.ToString() }); // TODO - CAMBIAR. Retornar UserDTO o algo que referencie al nuevo usuario
             }
-            catch (Exception ex) { //TODO - ver como tirar exception del otro lado
+            catch (Exception ex) // TODO - ver como tirar exception del otro lado
+            { 
+                Console.WriteLine($"Error al crear usuario {request.Name}");
                 return Task.FromResult(new MessageReply { Message = ex.Message });
             }
         }
+
+        public override Task<MessageReply> DeleteUser(UserName request, ServerCallContext context)
+        {
+            UserLogic session = UserLogic.GetInstance();
+            Console.WriteLine($"Eliminando usuario {request.Name}");
+
+            try
+            {
+                session.DeleteUser(request.Name);
+                return Task.FromResult(new MessageReply { Message = $"Usuario {request.Name}, eliminado" });
+            }
+            catch (Exception ex) // TODO - ver como tirar exception del otro lado
+            { 
+                Console.WriteLine($"Error al eliminar usuario {request.Name}");
+                return Task.FromResult(new MessageReply { Message = ex.Message });
+            }
+        }
+
 
     }
 }

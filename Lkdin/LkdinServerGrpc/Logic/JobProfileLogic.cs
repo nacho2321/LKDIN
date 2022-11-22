@@ -1,4 +1,5 @@
 ﻿using LkdinServerGrpc.Domain;
+using LkdinServerGrpc.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,10 @@ namespace LkdinServerGrpc.Logic
                     };
                     jobProfiles.Add(newJobProfile);
                 }
-            
+                else
+                {
+                    throw new DomainException($"Ya existe un perfil de trabajo con el nombre {name}");
+                }
                 return newJobProfile;
             }
         }

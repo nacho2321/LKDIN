@@ -8,9 +8,8 @@ service Admin {
 
   // Functions availables
   rpc PostUser(UserDTO) returns (MessageReply);
-  rpc DeleteUser(Name) returns (MessageReply);
-  rpc GetUser(Name) returns (MessageReply);
-  rpc GetUsers(UserRequest) returns (UserResponseList);
+  rpc DeleteUser(UserName) returns (MessageReply);
+  rpc UpdateUser(UserDTO) returns (MessageReply);
  
 }
 
@@ -21,10 +20,13 @@ service Admin {
 	string country = 4;
 }
 
-message Name {
+message UserName {
 	string name = 1;
 }
 
+message ProfileName {
+	string name = 1;
+}
 
 message MessageReply {
 	string message = 1;

@@ -149,13 +149,13 @@ namespace LkdinServerGrpc.Logic
         {
             lock (users)
             {
-                foreach (var u in users)
+                if (Exists(user))
                 {
-                    if (u.Name == user)
-                    {
-                        User userToRemove = GetUserByName(user);
-                        users.Remove(userToRemove);
-                    }
+                    User userToRemove = GetUserByName(user);
+                    users.Remove(userToRemove);
+                }
+                else {
+                    throw new DomainException($"El usuario {user} no existe");
                 }
             }
         }
