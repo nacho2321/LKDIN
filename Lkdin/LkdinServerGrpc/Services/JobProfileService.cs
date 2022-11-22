@@ -24,7 +24,7 @@ namespace LkdinServerGrpc
             }
             catch (Exception ex) // TODO - ver como tirar exception del otro lado
             {
-                Console.WriteLine($"Error al crear usuario {request.Name}");
+                Console.WriteLine($"Error al crear perfil de trabajo {request.Name}");
                 return Task.FromResult(new MessageReply { Message = ex.Message });
             }
         }
