@@ -26,7 +26,7 @@ namespace LkdinLogServer.Controllers
         {
             return logLogic.GetAll();
         }
-
+        /*
         [HttpGet]
         public IEnumerable<string> GetCreations()
         {
@@ -34,15 +34,15 @@ namespace LkdinLogServer.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<string> GetAllDeleted()
+        public IEnumerable<string> GetAllMessages()
         {
-            return logLogic.GetAllDeleted();
+            return logLogic.GetAllMessages();
         }
 
         [HttpGet]
-        public IEnumerable<string> GetAllMessages()
+        public IEnumerable<string> GetAllErrors()
         {
-            return logLogic.GetAllDeleted();
-        }
+            return logLogic.GetAllErrors();
+        }*/
     }
 }
