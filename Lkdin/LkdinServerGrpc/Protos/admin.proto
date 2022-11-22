@@ -30,10 +30,3 @@ message MessageReply {
 	string message = 1;
 }
 
-message UserRequest {
-	
-}
-
-message UserResponseList {
-  repeated UserDTO users = 1; 
-}
