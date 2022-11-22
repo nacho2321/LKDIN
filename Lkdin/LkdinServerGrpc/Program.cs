@@ -17,7 +17,7 @@ namespace LkdinServerGrpc
         public static async Task Main(string[] args)
         {
             UserLogic userLogic = UserLogic.GetInstance();
-            JobProfileLogic jobProfileLogic = new JobProfileLogic(userLogic);
+            JobProfileLogic jobProfileLogic = JobProfileLogic.GetInstance();
             MessageLogic messageLogic = new MessageLogic(userLogic);
 
             FileLogic fileLogic = new FileLogic();

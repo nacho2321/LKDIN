@@ -149,7 +149,6 @@ namespace LkdinServerGrpc.Logic
                 {
                     throw new DomainException($"El usuario {user} no existe");
                 }
-
             }
         }
 

@@ -11,7 +11,18 @@ namespace LkdinServerGrpc.Logic
     {
         private List<JobProfile> jobProfiles = new List<JobProfile>();
         private UserLogic userLogic;
+        private static JobProfileLogic instance;
+        private static readonly object singletonlock = new object();
 
+        public static JobProfileLogic GetInstance()
+        {
+            lock (singletonlock)
+            {
+                if (instance == null)
+                    instance = new JobProfileLogic(UserLogic.GetInstance());
+            }
+            return instance;
+        }
         public JobProfileLogic(UserLogic _userLogic)
         {
             userLogic = _userLogic;
@@ -66,29 +77,37 @@ namespace LkdinServerGrpc.Logic
         {
             lock (jobProfiles)
             {
-                foreach (var jp in jobProfiles)
+                if (Exists(name))
                 {
-                    if (jp.Name == name)
+                    foreach (var jp in jobProfiles)
                     {
-                        jp.Description = description;
-                        jp.ImagePath = imagePath;
-                        jp.Abilities = abilities;
+                        if (jp.Name == name)
+                        {
+                            jp.Description = description;
+                            jp.ImagePath = imagePath;
+                            jp.Abilities = abilities;
+                        }
                     }
+                }
+                else
+                {
+                    throw new DomainException($"El perfil de trabajo {name} no existe");
                 }
             }
         }
 
-        public void DeleteJobProfile(string name)
+        public void DeleteJobProfile(string profile)
         {
             lock (jobProfiles)
             {
-                foreach (var jp in jobProfiles)
+                if (Exists(profile))
                 {
-                    if (jp.Name == name)
-                    {
-                        JobProfile jobProfileToRemove = GetJobProfile(name);
-                        jobProfiles.Remove(jobProfileToRemove);
-                    }
+                    JobProfile profileToRemove = GetJobProfile(profile);
+                    jobProfiles.Remove(profileToRemove);
+                }
+                else
+                {
+                    throw new DomainException($"El perfil de trabajo {profile} no existe");
                 }
             }
         }
@@ -97,14 +116,21 @@ namespace LkdinServerGrpc.Logic
         {
             lock (jobProfiles)
             {
-                User userToDeleteImage = userLogic.GetUserByName(user);
-
-                foreach (var jp in jobProfiles)
+                if (Exists(user))
                 {
-                    if (jp.Name == userToDeleteImage.Profile.Name)
+                    User userToDeleteImage = userLogic.GetUserByName(user);
+
+                    foreach (var jp in jobProfiles)
                     {
-                        jp.ImagePath = null;
+                        if (jp.Name == userToDeleteImage.Profile.Name)
+                        {
+                            jp.ImagePath = null;
+                        }
                     }
+                }
+                else
+                {
+                    throw new DomainException($"El usuario {user} no existe");
                 }
             }
         }

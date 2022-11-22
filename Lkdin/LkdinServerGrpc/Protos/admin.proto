@@ -10,6 +10,10 @@ service Admin {
   rpc PostUser(UserDTO) returns (MessageReply);
   rpc DeleteUser(UserName) returns (MessageReply);
   rpc UpdateUser(UserDTO) returns (MessageReply);
+
+  rpc PostJobProfile(JobProfileDTO) returns (MessageReply);
+  rpc DeleteJobProfile(ProfileName) returns (MessageReply);
+  rpc UpdateJobProfile(JobProfileDTO) returns (MessageReply);
  
 }
 
@@ -18,6 +22,12 @@ service Admin {
 	int32 age = 2;
 	repeated string professions = 3;
 	string country = 4;
+}
+  message JobProfileDTO{
+	string name = 1;
+	string description = 2;
+	string imagePath = 3;
+	repeated string abilities = 4;
 }
 
 message UserName {
