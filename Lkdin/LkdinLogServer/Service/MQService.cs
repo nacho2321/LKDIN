@@ -1,4 +1,5 @@
-﻿using LkdinServerGrpc.Logic;
+﻿using LkdinLogServer.Data;
+using LkdinServerGrpc.Logic;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -36,15 +37,14 @@ namespace LkdinLogServer.Service
                 var message = Encoding.UTF8.GetString(body);
                 Console.WriteLine(" [x] Received {0}", message);
 
-                var data = LogLogic.GetInstance();
-                data.GetAll();
+                var data = LogDataAccess.GetInstance();
+                data.AddLog(message);
             };
 
             //"PRENDO" el consumo de mensajes
             channel.BasicConsume(queue: "logs",
                 autoAck: true,
                 consumer: consumer);
-
 
         }
     }

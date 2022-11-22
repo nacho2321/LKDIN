@@ -1,30 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace LkdinServerGrpc.Logic
+namespace LkdinLogServer.Data
 {
-    public class LogLogic
+    public class LogDataAccess
     {
         private List<string> logs = new List<string>();
 
         private object padlock;
-        private static LogLogic instance;
+        private static LogDataAccess instance;
 
         private static object singletonPadlock = new object();
-        public static LogLogic GetInstance()
+        public static LogDataAccess GetInstance()
         {
             lock (singletonPadlock)
             { // bloqueante 
                 if (instance == null)
                 {
-                    instance = new LogLogic();
+                    instance = new LogDataAccess();
                 }
             }
             return instance;
         }
 
-        private LogLogic()
+        private LogDataAccess()
         {
             logs = new List<string>();
             padlock = new object();

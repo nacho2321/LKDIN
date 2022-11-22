@@ -4,6 +4,7 @@ using LkdinServerGrpc.Connection;
 using LkdinServerGrpc.Logic;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using RabbitMQ.Client;
 using System;
 using System.Threading.Tasks;
 
@@ -16,17 +17,20 @@ namespace LkdinServerGrpc
 
         public static async Task Main(string[] args)
         {
+            LogPublisher logPublisher = new LogPublisher();
+            IModel channel = logPublisher.Setting();
+
             UserLogic userLogic = UserLogic.GetInstance();
             JobProfileLogic jobProfileLogic = JobProfileLogic.GetInstance();
             MessageLogic messageLogic = new MessageLogic(userLogic);
 
             FileLogic fileLogic = new FileLogic();
 
-            ConnectionHandler serverConnection = new ConnectionHandler(userLogic, jobProfileLogic, messageLogic, sender, listener, fileLogic);
+            ConnectionHandler serverConnection = new ConnectionHandler(userLogic, jobProfileLogic, messageLogic, sender, listener, fileLogic, logPublisher, channel);
 
             Console.WriteLine("Iniciando Aplicacion Servidor...");
 
-            Task.Run(() => serverConnection.Listen());
+            await Task.Run(() => serverConnection.Listen());
 
             CreateHostBuilder(args).Build().Run();
         }

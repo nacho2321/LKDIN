@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using RabbitMQ.Client;
 
 namespace LkdinServerGrpc.Connection
 {
@@ -25,17 +26,21 @@ namespace LkdinServerGrpc.Connection
         private UserLogic userLogic;
         private JobProfileLogic jobProfileLogic;
         private MessageLogic messageLogic;
+        private LogPublisher logPublisher;
+        private IModel channel;
 
         private FileLogic fileLogic;
 
         static readonly SettingsManager settingsMngr = new SettingsManager();
 
-        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender, Listener listener, FileLogic fileLogic)
+        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender, Listener listener, FileLogic fileLogic, LogPublisher logPublisher, IModel channel)
         {
             this.maxClients = Int32.Parse(settingsMngr.ReadSettings(ServerConfig.serverMaxClientsconfigkey));
             this.userLogic = userLogic;
             this.jobProfileLogic = jobProfileLogic;
             this.messageLogic = messageLogic;
+            this.logPublisher = logPublisher;
+            this.channel = channel;
 
             this.fileLogic = fileLogic;
             this.sender = sender;
@@ -46,7 +51,6 @@ namespace LkdinServerGrpc.Connection
             var localEndpoint = new IPEndPoint(IPAddress.Parse(ipServer), ipPort);
 
             this.tcpListener = new TcpListener(localEndpoint);
-
         }
 
         public async Task Listen()
@@ -119,7 +123,7 @@ namespace LkdinServerGrpc.Connection
 
                         messageLogic.CreateMessage(userSender, userReceptor, splittedData[2]);
                         await sender.Send(Command.CreateJobProfile, "MENSAJE ENVIADO CORRECTAMENTE", netStream);
-                        LogLogic.GetInstance().AddLog("Messages: SEND - Sender: " + userSender.Name + " - Receptor: " + userReceptor.Name);
+                        logPublisher.Message(channel, "Messages: SEND - Sender: " + userSender.Name + " - Receptor: " + userReceptor.Name);
                         break;
 
                     case Command.ReadMessages:
@@ -128,7 +132,7 @@ namespace LkdinServerGrpc.Connection
 
                         await sender.Send(Command.ReadMessages, messages, netStream);
                         await sender.Send(Command.ReadMessages, "MENSAJES MOSTRADOS CORRECTAMENTE", netStream);
-                        LogLogic.GetInstance().AddLog("Messages: SHOW - User: " + splittedData[0]);
+                        logPublisher.Message(channel, "Messages: SHOW - User: " + splittedData[0]);
                         break;
 
                     case Command.GetUsersName:
@@ -174,7 +178,7 @@ namespace LkdinServerGrpc.Connection
         private async Task CreationResponseHandler(Command cmd, string response, NetworkStream netStream)
         {
             await sender.Send(cmd, response, netStream);
-            LogLogic.GetInstance().AddLog(response);
+            logPublisher.Message(channel, response);
         }
 
 
