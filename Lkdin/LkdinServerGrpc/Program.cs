@@ -30,7 +30,7 @@ namespace LkdinServerGrpc
 
             Console.WriteLine("Iniciando Aplicacion Servidor...");
 
-            await Task.Run(() => serverConnection.Listen());
+            Task.Run(() => serverConnection.Listen());
 
             CreateHostBuilder(args).Build().Run();
         }
