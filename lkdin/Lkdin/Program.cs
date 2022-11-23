@@ -19,7 +19,6 @@ namespace Lkdin
         static TcpClient tcpClient;
 
         static int specialCharactersUsed = 0;
-        static FileLogic fileLogic = new FileLogic();
 
         static async Task Main(string[] args)
         {
@@ -341,7 +340,7 @@ namespace Lkdin
 
             Console.WriteLine("Ubicación de la foto de perfil:");
             string path = Console.ReadLine();
-            jobProfileData += path + "-";
+            jobProfileData += FileLogic.GetName(path) + "-";
             specialCharactersUsed++;
 
             Console.WriteLine("Habilidades:");
@@ -438,7 +437,7 @@ namespace Lkdin
         private static string FormatSpecificProfile(string rawProfileData)
         {
             string[] splittedData = rawProfileData.Split('-');
-            string filePath = fileLogic.GetPath(splittedData[2]);
+            string filePath = FileLogic.GetPath(splittedData[2]);
 
             string profile = "NOMBRE: " + splittedData[0] + "\nDESCRIPCIÓN: " + splittedData[1] + "\nFOTO DE PERFIL: " + filePath + "\nHABILIDADES: ";
 
