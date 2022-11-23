@@ -17,21 +17,22 @@ service Admin {
  
 }
 
-  message UserDTO{
+message UserDTO{
 	string name = 1;
 	int32 age = 2;
 	repeated string professions = 3;
 	string country = 4;
 }
-  message JobProfileDTO{
+
+message UserName {
+	string name = 1;
+}
+
+message JobProfileDTO{
 	string name = 1;
 	string description = 2;
 	string imagePath = 3;
 	repeated string abilities = 4;
-}
-
-message UserName {
-	string name = 1;
 }
 
 message ProfileName {
@@ -41,3 +42,4 @@ message ProfileName {
 message MessageReply {
 	string message = 1;
 }
+

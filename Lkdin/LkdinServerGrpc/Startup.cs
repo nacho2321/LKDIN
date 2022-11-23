@@ -31,7 +31,7 @@ namespace LkdinServerGrpc
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<UserService>();
+                endpoints.MapGrpcService<LkdinService>();
 
                 endpoints.MapGet("/", async context =>
                 {

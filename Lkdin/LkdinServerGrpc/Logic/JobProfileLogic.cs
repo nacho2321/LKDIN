@@ -10,7 +10,7 @@ namespace LkdinServerGrpc.Logic
     public class JobProfileLogic
     {
         private List<JobProfile> jobProfiles = new List<JobProfile>();
-        private UserLogic userLogic;
+        private UserLogic userLogic = UserLogic.GetInstance();
         private static JobProfileLogic instance;
         private static readonly object singletonlock = new object();
 
@@ -19,13 +19,9 @@ namespace LkdinServerGrpc.Logic
             lock (singletonlock)
             {
                 if (instance == null)
-                    instance = new JobProfileLogic(UserLogic.GetInstance());
+                    instance = new JobProfileLogic();
             }
             return instance;
-        }
-        public JobProfileLogic(UserLogic _userLogic)
-        {
-            userLogic = _userLogic;
         }
 
         public JobProfile CreateJobProfile(string name, string description, string imagePath, List<string> abilities)
