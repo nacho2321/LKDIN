@@ -4,6 +4,7 @@ using LkdinServerGrpc.Connection;
 using LkdinServerGrpc.Logic;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using RabbitMQ.Client;
 using System;
 using System.Threading.Tasks;
 
@@ -16,6 +17,9 @@ namespace LkdinServerGrpc
 
         public static async Task Main(string[] args)
         {
+            LogPublisher logPublisher = new LogPublisher();
+            IModel channel = logPublisher.Setting();
+
             UserLogic userLogic = UserLogic.GetInstance();
             JobProfileLogic jobProfileLogic = JobProfileLogic.GetInstance();
             MessageLogic messageLogic = new MessageLogic(userLogic);

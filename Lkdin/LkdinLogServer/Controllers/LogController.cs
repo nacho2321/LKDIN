@@ -1,4 +1,5 @@
-﻿using LkdinServerGrpc.Logic;
+﻿using LkdinLogServer.Data;
+using LkdinServerGrpc.Logic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -22,28 +23,28 @@ namespace LkdinLogServer.Controllers
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            return LogLogic.GetInstance().GetAll();
+            return LogDataAccess.GetInstance().GetAll();
         }
 
         [Route("logs/creations")]
         [HttpGet]
         public IEnumerable<string> GetCreations()
         {
-            return LogLogic.GetInstance().GetAllCreations();
+            return LogDataAccess.GetInstance().GetAllCreations();
         }
 
         [Route("logs/messages")]
         [HttpGet]
         public IEnumerable<string> GetAllMessages()
         {
-            return LogLogic.GetInstance().GetAllMessages();
+            return LogDataAccess.GetInstance().GetAllMessages();
         }
 
         [Route("logs/errors")]
         [HttpGet]
         public IEnumerable<string> GetAllErrors()
         {
-            return LogLogic.GetInstance().GetAllErrors();
+            return LogDataAccess.GetInstance().GetAllErrors();
         }
     }
 }
