@@ -80,23 +80,6 @@ namespace LkdinServerGrpc
             }
         }
 
-        public override Task<MessageReply> DeleteJobProfile(ProfileName request, ServerCallContext context)
-        {
-            JobProfileLogic session = JobProfileLogic.GetInstance();
-            Console.WriteLine($"Eliminando perfil de trabajo {request.Name}");
-
-            try
-            {
-                session.DeleteJobProfile(request.Name);
-                return Task.FromResult(new MessageReply { Message = $"Perfil de trabajo {request.Name}, eliminado" });
-            }
-            catch (Exception ex) // TODO - ver como tirar exception del otro lado
-            {
-                Console.WriteLine($"Error al eliminar perfil de trabajo {request.Name}");
-                return Task.FromResult(new MessageReply { Message = ex.Message });
-            }
-        }
-
         public override Task<MessageReply> UpdateJobProfile(JobProfileDTO request, ServerCallContext context)
         {
             JobProfileLogic session = JobProfileLogic.GetInstance();
@@ -113,5 +96,39 @@ namespace LkdinServerGrpc
                 return Task.FromResult(new MessageReply { Message = ex.Message });
             }
         }
+
+        public override Task<MessageReply> DeleteJobProfile(ProfileName request, ServerCallContext context)
+        {
+            JobProfileLogic session = JobProfileLogic.GetInstance();
+            Console.WriteLine($"Eliminando perfil de trabajo {request.Name}");
+
+            try
+            {
+                session.DeleteJobProfile(request.Name);
+                return Task.FromResult(new MessageReply { Message = $"Perfil de trabajo {request.Name}, eliminado" });
+            }
+            catch (Exception ex) // TODO - ver como tirar exception del otro lado
+            {
+                Console.WriteLine($"Error al eliminar perfil de trabajo {request.Name}");
+                return Task.FromResult(new MessageReply { Message = ex.Message });
+            }
+        }
+        public override Task<MessageReply> DeleteJobProfileImage(UserName request, ServerCallContext context)
+        {
+            JobProfileLogic session = JobProfileLogic.GetInstance();
+            Console.WriteLine($"Eliminando imagen de perfil de trabajo {request.Name}");
+
+            try
+            {
+                session.DeleteJobProfileImage(request.Name);
+                return Task.FromResult(new MessageReply { Message = $"Perfil de trabajo {request.Name}, eliminado" });
+            }
+            catch (Exception ex) // TODO - ver como tirar exception del otro lado
+            {
+                Console.WriteLine($"Error al eliminar la imagen del perfil de trabajo {request.Name}");
+                return Task.FromResult(new MessageReply { Message = ex.Message });
+            }
+        }
+
     }
 }

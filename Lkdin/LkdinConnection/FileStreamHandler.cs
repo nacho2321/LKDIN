@@ -7,16 +7,10 @@ namespace LkdinConnection
 {
     public class FileStreamHandler
     {
-        private readonly FileLogic filelogic;
-
-        public FileStreamHandler()
-        {
-            filelogic = new FileLogic();
-        }
 
         public byte[] Read(string path, long offset, int length)
         {
-            if (filelogic.Exists(path))
+            if (FileLogic.Exists(path))
             {
                 var data = new byte[length];
 
@@ -42,7 +36,7 @@ namespace LkdinConnection
 
         public void Write(string fileName, byte[] data)
         {
-            FileMode mode = (filelogic.Exists(fileName)) ? FileMode.Append : FileMode.Create;
+            FileMode mode = (FileLogic.Exists(fileName)) ? FileMode.Append : FileMode.Create;
             using var fileStream = new FileStream(fileName, mode);
 
             fileStream.Write(data, 0, data.Length);

@@ -26,18 +26,15 @@ namespace LkdinServerGrpc.Connection
         private JobProfileLogic jobProfileLogic;
         private MessageLogic messageLogic;
 
-        private FileLogic fileLogic;
-
         static readonly SettingsManager settingsMngr = new SettingsManager();
 
-        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender, Listener listener, FileLogic fileLogic)
+        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender, Listener listener)
         {
             this.maxClients = Int32.Parse(settingsMngr.ReadSettings(ServerConfig.serverMaxClientsconfigkey));
             this.userLogic = userLogic;
             this.jobProfileLogic = jobProfileLogic;
             this.messageLogic = messageLogic;
 
-            this.fileLogic = fileLogic;
             this.sender = sender;
             this.listener = listener;
 
@@ -109,7 +106,7 @@ namespace LkdinServerGrpc.Connection
                         break;
 
                     case Command.CreateJobProfile:
-                        string fileRoute = fileLogic.GetPath(splittedData[2]);
+                        string fileRoute = FileLogic.GetPath(splittedData[2]);
                         JobProfile newJobProfile = jobProfileLogic.CreateJobProfile(splittedData[0], splittedData[1], fileRoute, splittedData[3].Split(";").ToList());
                         await CreationResponseHandler(Command.CreateJobProfile,"Creation: PERFIL DE TRABAJO CREADO CORRECTAMENTE" + " - Nombre: " + newJobProfile.Name, netStream);
                         break;
@@ -180,7 +177,7 @@ namespace LkdinServerGrpc.Connection
 
         private string GetJobProfileMessage(JobProfile profile) 
         {
-            return profile.Name + '-' + profile.Description + '-' + fileLogic.GetName(profile.ImagePath) + '-' + String.Join(";", profile.Abilities.ToArray());
+            return profile.Name + '-' + profile.Description + '-' + FileLogic.GetName(profile.ImagePath) + '-' + String.Join(";", profile.Abilities.ToArray());
         }
     }
 }

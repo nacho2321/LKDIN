@@ -18,56 +18,40 @@ namespace LkdinServer.Connection
         private int connections = 0;
         private int maxClients;
 
-        //private Socket socket;
         private Sender sender;
         private TcpListener tcpListener;
         private Listener listener;
         private UserLogic userLogic;
         private JobProfileLogic jobProfileLogic;
         private MessageLogic messageLogic;
-       // private LogLogic logLogic;
-
-        private FileLogic fileLogic;
-
         static readonly SettingsManager settingsMngr = new SettingsManager();
 
-        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender, Listener listener, FileLogic fileLogic)
+        public ConnectionHandler(UserLogic userLogic, JobProfileLogic jobProfileLogic, MessageLogic messageLogic, Sender sender, Listener listener)
         {
             this.maxClients = Int32.Parse(settingsMngr.ReadSettings(ServerConfig.serverMaxClientsconfigkey));
             this.userLogic = userLogic;
             this.jobProfileLogic = jobProfileLogic;
             this.messageLogic = messageLogic;
-            //this.logLogic = logLogic;
-
-            this.fileLogic = fileLogic;
             this.sender = sender;
             this.listener = listener;
-
-            
-            //this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
             string ipServer = settingsMngr.ReadSettings(ServerConfig.serverIPconfigkey);
             int ipPort = int.Parse(settingsMngr.ReadSettings(ServerConfig.serverPortconfigkey));
             var localEndpoint = new IPEndPoint(IPAddress.Parse(ipServer), ipPort);
 
             this.tcpListener = new TcpListener(localEndpoint);
-            //this.socket.Bind(localEndpoint);
 
         }
 
         public async Task Listen()
         {
             tcpListener.Start(maxClients);
-            //this.socket.Listen(maxClients);
-
             while (connections < maxClients)
             {
-                //var socketClient = this.socket.Accept();
 
                 var tcpClientSocket = await tcpListener.AcceptTcpClientAsync().ConfigureAwait(false);
                 Console.WriteLine("Nueva conexión establecida");
 
-                //new Thread(() => this.ClientHandler(socketClient)).Start();
                 var task = Task.Run(async () => await ClientHandler(tcpClientSocket).ConfigureAwait(false));
                 connections++;
             }
@@ -118,7 +102,7 @@ namespace LkdinServer.Connection
                         break;
 
                     case Command.CreateJobProfile:
-                        string fileRoute = fileLogic.GetPath(splittedData[2]);
+                        string fileRoute = FileLogic.GetPath(splittedData[2]);
                         JobProfile newJobProfile = jobProfileLogic.CreateJobProfile(splittedData[0], splittedData[1], fileRoute, splittedData[3].Split(";").ToList());
                         await CreationResponseHandler(Command.CreateJobProfile, newJobProfile, "PERFIL DE TRABAJO CREADO CORRECTAMENTE", "EL PERFIL DE TRABAJO YA EXISTE", netStream);
                         break;
@@ -189,7 +173,7 @@ namespace LkdinServer.Connection
 
         private string GetJobProfileMessage(JobProfile profile) 
         {
-            return profile.Name + '-' + profile.Description + '-' + fileLogic.GetName(profile.ImagePath) + '-' + String.Join(";", profile.Abilities.ToArray());
+            return profile.Name + '-' + profile.Description + '-' + FileLogic.GetName(profile.ImagePath) + '-' + String.Join(";", profile.Abilities.ToArray());
         }
     }
 }

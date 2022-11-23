@@ -17,9 +17,8 @@ namespace LkdinServer
             UserLogic userLogic = new UserLogic();
             JobProfileLogic jobProfileLogic = new JobProfileLogic(userLogic);
             MessageLogic messageLogic = new MessageLogic(userLogic);
-            FileLogic fileLogic = new FileLogic();
 
-            ConnectionHandler serverConnection = new ConnectionHandler(userLogic, jobProfileLogic, messageLogic, sender, listener, fileLogic);
+            ConnectionHandler serverConnection = new ConnectionHandler(userLogic, jobProfileLogic, messageLogic, sender, listener);
 
             Console.WriteLine("Iniciando Aplicacion Servidor...");
             await serverConnection.Listen();

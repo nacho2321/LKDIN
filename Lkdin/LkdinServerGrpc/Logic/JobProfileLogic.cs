@@ -1,4 +1,5 @@
-﻿using LkdinServerGrpc.Domain;
+﻿using LkdinConnection.Logic;
+using LkdinServerGrpc.Domain;
 using LkdinServerGrpc.Exceptions;
 using System;
 using System.Collections.Generic;
@@ -99,6 +100,7 @@ namespace LkdinServerGrpc.Logic
                 if (Exists(profile))
                 {
                     JobProfile profileToRemove = GetJobProfile(profile);
+                    FileLogic.DeleteFile(profileToRemove.ImagePath);
                     jobProfiles.Remove(profileToRemove);
                 }
                 else
@@ -108,7 +110,7 @@ namespace LkdinServerGrpc.Logic
             }
         }
 
-        public void DeleteImage(string user)
+        public void DeleteJobProfileImage(string user)
         {
             lock (jobProfiles)
             {
@@ -116,13 +118,17 @@ namespace LkdinServerGrpc.Logic
                 {
                     User userToDeleteImage = userLogic.GetUserByName(user);
 
-                    foreach (var jp in jobProfiles)
+                    JobProfile profileToAlter = jobProfiles.Find(profile => profile.Name == userToDeleteImage.Profile.Name);
+                    if (profileToAlter.Name != null)
                     {
-                        if (jp.Name == userToDeleteImage.Profile.Name)
-                        {
-                            jp.ImagePath = null;
-                        }
+                        FileLogic.DeleteFile(profileToAlter.ImagePath);
+                        profileToAlter.ImagePath = "";
                     }
+                    else
+                    {
+                        throw new DomainException($"El usuario {user} no tiene perfil asociado");
+                    }
+
                 }
                 else
                 {

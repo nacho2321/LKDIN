@@ -12,7 +12,6 @@ namespace LkdinConnection
         private readonly int protocolDataLength;
         private readonly int maxPacketSize;
 
-        private readonly FileLogic fileLogic;
         private readonly FileStreamHandler fileStreamHandler;
         
         public Sender()
@@ -20,7 +19,6 @@ namespace LkdinConnection
             this.protocolDataLength = Protocol.protocolDataLength;
             this.maxPacketSize = Protocol.MaxPacketSize;
 
-            this.fileLogic = new FileLogic();
             this.fileStreamHandler = new FileStreamHandler();
         }
 
@@ -42,13 +40,13 @@ namespace LkdinConnection
 
         public async Task SendFile(string path, NetworkStream netStream)
         {
-            if (fileLogic.Exists(path))
+            if (FileLogic.Exists(path))
             {
-                string fileName = this.fileLogic.GetName(path);
+                string fileName = FileLogic.GetName(path);
                 byte[] headerData = this.HeaderEncoder(Command.SendFile, fileName.Length);
                 byte[] convertedfileName = Encoding.UTF8.GetBytes(fileName);
 
-                long fileSize = this.fileLogic.GetFileSize(path);
+                long fileSize = FileLogic.GetFileSize(path);
                 byte[] convertedfileSize = BitConverter.GetBytes(fileSize);
 
                 await BytesSender(headerData, netStream);          // Envia header con orden y largo del nombre del archivo

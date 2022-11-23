@@ -20,9 +20,8 @@ namespace LkdinServerGrpc
             JobProfileLogic jobProfileLogic = JobProfileLogic.GetInstance();
             MessageLogic messageLogic = new MessageLogic(userLogic);
 
-            FileLogic fileLogic = new FileLogic();
 
-            ConnectionHandler serverConnection = new ConnectionHandler(userLogic, jobProfileLogic, messageLogic, sender, listener, fileLogic);
+            ConnectionHandler serverConnection = new ConnectionHandler(userLogic, jobProfileLogic, messageLogic, sender, listener);
 
             Console.WriteLine("Iniciando Aplicacion Servidor...");
 

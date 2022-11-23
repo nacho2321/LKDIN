@@ -12,8 +12,9 @@ service Admin {
   rpc UpdateUser(UserDTO) returns (MessageReply);
 
   rpc PostJobProfile(JobProfileDTO) returns (MessageReply);
-  rpc DeleteJobProfile(ProfileName) returns (MessageReply);
   rpc UpdateJobProfile(JobProfileDTO) returns (MessageReply);
+  rpc DeleteJobProfile(ProfileName) returns (MessageReply);
+  rpc DeleteJobProfileImage(UserName) returns (MessageReply);
  
 }
 

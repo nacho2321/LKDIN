@@ -5,26 +5,32 @@ using System.Text;
 
 namespace LkdinConnection.Logic
 {
-    public class FileLogic
+    public static class FileLogic
     {
-        public bool Exists(string path)
+        public static bool Exists(string path)
         {
             return File.Exists(path);
         }
 
-        public string GetName(string path)
+        public static string GetName(string path)
         {
             return (Exists(path)) ? new FileInfo(path).Name : "";
         }
 
-        public string GetPath(string fileName)
+        public static string GetPath(string fileName)
         {
             return Path.GetFullPath(fileName);
         }
 
-        public long GetFileSize(string path)
+        public static long GetFileSize(string path)
         {
             return (Exists(path)) ? new FileInfo(path).Length : 0;
+        }
+
+        public static void DeleteFile(string path)
+        {
+            if(Exists(path))
+                File.Delete(GetPath(path));
         }
 
     }

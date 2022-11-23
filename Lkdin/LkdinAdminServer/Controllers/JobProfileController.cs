@@ -31,15 +31,6 @@ namespace LkdinAdminServer.Controllers
             var reply = await client.PostJobProfileAsync(profile);
             return Ok(reply.Message);
         }
-        
-        [HttpDelete("{profileName}")]
-        public async Task<ActionResult> Delete(ProfileName profileName)
-        {
-            using var channel = GrpcChannel.ForAddress(grpcURL);
-            client = new Admin.AdminClient(channel);
-            var reply = await client.DeleteJobProfileAsync(profileName);
-            return Ok(reply.Message);
-        }
 
         [HttpPut]
         public async Task<ActionResult> Put([FromBody] JobProfileDTO profile)
@@ -49,5 +40,23 @@ namespace LkdinAdminServer.Controllers
             var reply = await client.UpdateJobProfileAsync(profile);
             return Ok(reply.Message);
         }
+
+        [HttpDelete("{profileName}")]
+        public async Task<ActionResult> Delete(ProfileName profileName)
+        {
+            using var channel = GrpcChannel.ForAddress(grpcURL);
+            client = new Admin.AdminClient(channel);
+            var reply = await client.DeleteJobProfileAsync(profileName);
+            return Ok(reply.Message);
+        }
+
+        public async Task<ActionResult> DeleteImage(UserName userName)
+        {
+            using var channel = GrpcChannel.ForAddress(grpcURL);
+            client = new Admin.AdminClient(channel);
+            var reply = await client.DeleteJobProfileImageAsync(userName);
+            return Ok(reply.Message);
+        }
+
     }
 }
