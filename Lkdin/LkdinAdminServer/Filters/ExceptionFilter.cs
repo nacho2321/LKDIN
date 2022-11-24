@@ -15,7 +15,15 @@ namespace LkdinAdminServer.Controllers
 
             if (context.Exception is Grpc.Core.RpcException e)
             {
-                if (e.Status.StatusCode == StatusCode.AlreadyExists) { statusCode = 400; } else { statusCode = 500; }
+                if (e.Status.StatusCode == StatusCode.InvalidArgument)
+                { 
+                    statusCode = 400;
+                }
+                else
+                {
+                    statusCode = 500;
+                }
+
                 errorMessage = e.Status.Detail;
             }
             else

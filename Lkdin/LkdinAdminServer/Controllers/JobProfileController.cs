@@ -59,6 +59,5 @@ namespace LkdinAdminServer.Controllers
             return Ok(reply.Message);
         }
 
-
     }
 }
