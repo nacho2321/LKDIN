@@ -439,12 +439,7 @@ namespace Lkdin
             string[] splittedData = rawProfileData.Split('-');
             string filePath = FileLogic.GetPath(splittedData[2]);
 
-            string profile = "NOMBRE: " + splittedData[0] + "\nDESCRIPCIÓN: " + splittedData[1] + "\nFOTO DE PERFIL: " + filePath + "\nHABILIDADES: ";
-
-            string[] abilities = splittedData[3].Split(';');
-
-            for (int i = 0; i < abilities.Length; i++)
-                profile += "\n" + "|" + i + "|" + abilities[i];
+            string profile = "NOMBRE: " + splittedData[0] + "\nDESCRIPCIÓN: " + splittedData[1] + "\nFOTO DE PERFIL: " + filePath;
 
             return profile;
         }

@@ -173,7 +173,7 @@ namespace LkdinServer.Connection
 
         private string GetJobProfileMessage(JobProfile profile) 
         {
-            return profile.Name + '-' + profile.Description + '-' + FileLogic.GetName(profile.ImagePath) + '-' + String.Join(";", profile.Abilities.ToArray());
+            return profile.Name + '-' + profile.Description + '-' + FileLogic.GetName(profile.ImagePath);
         }
     }
 }
