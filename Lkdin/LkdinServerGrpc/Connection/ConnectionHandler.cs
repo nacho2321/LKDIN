@@ -148,11 +148,23 @@ namespace LkdinServerGrpc.Connection
                     case Command.GetSpecificProfile:
                         JobProfile profile = userLogic.GetProfileByName(splittedData[0]);
 
-                        // envio info del perfil
-                        await sender.Send(Command.GetSpecificProfile, GetJobProfileMessage(profile), netStream);
+                        if (FileLogic.Exists(profile.ImagePath))
+                        {
+                            // envio info del perfil
+                            await sender.Send(Command.GetSpecificProfile, GetJobProfileMessage(profile), netStream);
+                            // envio imagen del perfil
+                            await sender.SendFile(profile.ImagePath, netStream);
+                        }
+                        else {
+                            
+                            JobProfile prfl = new JobProfile();
+                            prfl.Name = profile.Name;
+                            prfl.Description = profile.Description;
+                            prfl.Abilities = profile.Abilities;
+                            prfl.ImagePath = "";
 
-                        // envio imagen del perfil
-                        await sender.SendFile(profile.ImagePath, netStream);
+                            await sender.Send(Command.GetSpecificProfile, GetJobProfileMessage(prfl), netStream);
+                        }
 
                         break;
 
@@ -182,6 +194,7 @@ namespace LkdinServerGrpc.Connection
 
         private string GetJobProfileMessage(JobProfile profile) 
         {
+            string name = FileLogic.GetName(profile.ImagePath);
             return profile.Name + '-' + profile.Description + '-' + FileLogic.GetName(profile.ImagePath);
         }
     }
