@@ -72,7 +72,7 @@ namespace LkdinServerGrpc.Logic
             return userToReturn;
         }
 
-        private bool Exists(string name)
+        public bool Exists(string name)
         {
             return (GetUserByName(name) != null);
         }

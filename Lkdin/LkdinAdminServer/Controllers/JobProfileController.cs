@@ -22,7 +22,7 @@ namespace LkdinAdminServer.Controllers
             AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
             grpcURL = SettingsMgr.ReadSettings(ServerConfig.GrpcURL);
         }
-        
+
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] JobProfileDTO profile)
         {
@@ -41,6 +41,15 @@ namespace LkdinAdminServer.Controllers
             return Ok(reply.Message);
         }
 
+        [HttpPatch]
+        public async Task<ActionResult> PatchRemoveImage(UserName userName)
+        {
+            using var channel = GrpcChannel.ForAddress(grpcURL);
+            client = new Admin.AdminClient(channel);
+            var reply = await client.DeleteJobProfileImageAsync(userName);
+            return Ok(reply.Message);
+        }
+
         [HttpDelete("{profileName}")]
         public async Task<ActionResult> Delete(ProfileName profileName)
         {
@@ -50,13 +59,6 @@ namespace LkdinAdminServer.Controllers
             return Ok(reply.Message);
         }
 
-        public async Task<ActionResult> DeleteImage(UserName userName)
-        {
-            using var channel = GrpcChannel.ForAddress(grpcURL);
-            client = new Admin.AdminClient(channel);
-            var reply = await client.DeleteJobProfileImageAsync(userName);
-            return Ok(reply.Message);
-        }
 
     }
 }

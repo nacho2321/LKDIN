@@ -17,7 +17,7 @@ namespace LkdinServerGrpc
 
         public static async Task Main(string[] args)
         {
-            LogPublisher logPublisher = new LogPublisher();
+           LogPublisher logPublisher = new LogPublisher();
             IModel channel = logPublisher.Setting();
 
             UserLogic userLogic = UserLogic.GetInstance();

@@ -15,7 +15,7 @@ namespace LkdinServerGrpc.Domain
         public const int DescriptionMinLength = 3;
         public const int DescriptionMaxLength = 250;
 
-        public const int ImagePathMinLength = 3;
+        public const int ImagePathMinLength = 0;
         public const int ImagePathMaxLength = 550;
 
         private string name;

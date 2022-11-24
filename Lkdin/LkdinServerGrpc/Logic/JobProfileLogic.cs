@@ -114,7 +114,7 @@ namespace LkdinServerGrpc.Logic
         {
             lock (jobProfiles)
             {
-                if (Exists(user))
+                if (userLogic.Exists(user))
                 {
                     User userToDeleteImage = userLogic.GetUserByName(user);
 

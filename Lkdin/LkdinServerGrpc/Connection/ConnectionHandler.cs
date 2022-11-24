@@ -62,6 +62,7 @@ namespace LkdinServerGrpc.Connection
 
                 var task = Task.Run(async () => await ClientHandler(tcpClientSocket).ConfigureAwait(false));
                 connections++;
+
             }
 
             Console.WriteLine("Limite de conexiones alcanzado");
@@ -151,7 +152,7 @@ namespace LkdinServerGrpc.Connection
                         await sender.Send(Command.GetSpecificProfile, GetJobProfileMessage(profile), netStream);
 
                         // envio imagen del perfil
-                        await sender.SendFile(profile.ImagePath, netStream); //TODO ImagePath tiene que guardar la ruta en server, no la indicada x usuario
+                        await sender.SendFile(profile.ImagePath, netStream);
 
                         break;
 

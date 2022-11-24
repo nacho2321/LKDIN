@@ -113,6 +113,7 @@ namespace LkdinServerGrpc
                 return Task.FromResult(new MessageReply { Message = ex.Message });
             }
         }
+
         public override Task<MessageReply> DeleteJobProfileImage(UserName request, ServerCallContext context)
         {
             JobProfileLogic session = JobProfileLogic.GetInstance();
@@ -121,7 +122,7 @@ namespace LkdinServerGrpc
             try
             {
                 session.DeleteJobProfileImage(request.Name);
-                return Task.FromResult(new MessageReply { Message = $"Perfil de trabajo {request.Name}, eliminado" });
+                return Task.FromResult(new MessageReply { Message = $"Imagen del perfil de trabajo {request.Name}, eliminada" });
             }
             catch (Exception ex) // TODO - ver como tirar exception del otro lado
             {
