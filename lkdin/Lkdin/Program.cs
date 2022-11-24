@@ -396,8 +396,13 @@ namespace Lkdin
                 await sender.Send(Command.GetSpecificProfile, user, netStream);
 
                 string recievedData = (await listener.ReceiveData(netStream))[1];
-                await listener.ReceiveData(netStream);
 
+                string[] splittedData = recievedData.Split('-');
+
+                if (splittedData[splittedData.Length - 1] != "")
+                {
+                    await listener.ReceiveData(netStream);
+                }
                 Console.WriteLine(FormatSpecificProfile(recievedData));
             }
             else
@@ -437,7 +442,7 @@ namespace Lkdin
         private static string FormatSpecificProfile(string rawProfileData)
         {
             string[] splittedData = rawProfileData.Split('-');
-            string filePath = FileLogic.GetPath(splittedData[2]);
+            string filePath = splittedData[splittedData.Length - 1] != "" ? FileLogic.GetPath(splittedData[2]) : "----";
 
             string profile = "NOMBRE: " + splittedData[0] + "\nDESCRIPCIÓN: " + splittedData[1] + "\nFOTO DE PERFIL: " + filePath;
 
