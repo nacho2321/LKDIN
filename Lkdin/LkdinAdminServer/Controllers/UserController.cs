@@ -33,11 +33,16 @@ namespace LkdinAdminServer.Controllers
         }
 
         [HttpDelete("{userName}")]
-        public async Task<ActionResult> Delete(UserName userName)
+        public async Task<ActionResult> Delete(string userName)
         {
             using var channel = GrpcChannel.ForAddress(grpcURL);
             client = new Admin.AdminClient(channel);
-            var reply = await client.DeleteUserAsync(userName);
+
+            UserName name = new UserName();
+            name.Name = userName;
+
+            var reply = await client.DeleteUserAsync(name);
+
             return Ok(reply.Message);
         }
 

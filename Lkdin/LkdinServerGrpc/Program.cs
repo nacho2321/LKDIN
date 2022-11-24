@@ -25,7 +25,7 @@ namespace LkdinServerGrpc
             MessageLogic messageLogic = new MessageLogic(userLogic);
 
 
-            ConnectionHandler serverConnection = new ConnectionHandler(userLogic, jobProfileLogic, messageLogic, sender, listener);
+            ConnectionHandler serverConnection = new ConnectionHandler(userLogic, jobProfileLogic, messageLogic, sender, listener, logPublisher, channel);
 
             Console.WriteLine("Iniciando Aplicacion Servidor...");
 

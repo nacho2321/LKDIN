@@ -41,21 +41,29 @@ namespace LkdinAdminServer.Controllers
             return Ok(reply.Message);
         }
 
-        [HttpPatch]
-        public async Task<ActionResult> PatchRemoveImage(UserName userName)
+        [HttpPatch("image/{userName}")]
+        public async Task<ActionResult> PatchRemoveImage(string userName)
         {
             using var channel = GrpcChannel.ForAddress(grpcURL);
             client = new Admin.AdminClient(channel);
-            var reply = await client.DeleteJobProfileImageAsync(userName);
+
+            UserName name = new UserName();
+            name.Name = userName;
+
+            var reply = await client.DeleteJobProfileImageAsync(name);
             return Ok(reply.Message);
         }
 
         [HttpDelete("{profileName}")]
-        public async Task<ActionResult> Delete(ProfileName profileName)
+        public async Task<ActionResult> Delete(string profileName)
         {
             using var channel = GrpcChannel.ForAddress(grpcURL);
             client = new Admin.AdminClient(channel);
-            var reply = await client.DeleteJobProfileAsync(profileName);
+
+            ProfileName name = new ProfileName();
+            name.Name = profileName;
+
+            var reply = await client.DeleteJobProfileAsync(name);
             return Ok(reply.Message);
         }
 
