@@ -41,7 +41,7 @@ namespace LkdinAdminServer.Controllers
             return Ok(reply.Message);
         }
 
-        [HttpPatch("image/{userName}")]
+        [HttpPatch("images/{userName}")]
         public async Task<ActionResult> PatchRemoveImage(string userName)
         {
             using var channel = GrpcChannel.ForAddress(grpcURL);
